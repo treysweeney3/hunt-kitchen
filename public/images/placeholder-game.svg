@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#E8E4DD"/>
+  <g transform="translate(150, 80)">
+    <!-- Deer/game silhouette -->
+    <path d="M50 0 L55 15 L65 10 L60 25 L70 20 L55 35 L55 45 L80 50 L80 90 L70 90 L70 70 L60 70 L60 90 L50 90 L50 70 L40 70 L40 90 L30 90 L30 70 L20 70 L20 90 L10 90 L10 50 L35 45 L35 35 L20 20 L30 25 L25 10 L35 15 L40 0 Z"
+          fill="#2D5A3D" opacity="0.4"/>
+    <!-- Antlers -->
+    <path d="M40 0 L35 -15 L25 -10 M40 0 L30 -20 L20 -15" stroke="#2D5A3D" stroke-width="3" fill="none" opacity="0.4"/>
+    <path d="M50 0 L55 -15 L65 -10 M50 0 L60 -20 L70 -15" stroke="#2D5A3D" stroke-width="3" fill="none" opacity="0.4"/>
+  </g>
+  <text x="200" y="240" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#6B7280">No image available</text>
+</svg>
