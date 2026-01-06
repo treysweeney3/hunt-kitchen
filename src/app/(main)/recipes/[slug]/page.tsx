@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import prisma from '@/lib/prisma';
 import { RecipeHero } from '@/components/recipes/RecipeHero';
 import { IngredientList } from '@/components/recipes/IngredientList';
 import { InstructionSteps } from '@/components/recipes/InstructionSteps';
@@ -23,18 +24,133 @@ interface RecipePageProps {
 }
 
 async function getRecipe(slug: string): Promise<Recipe | null> {
-  // TODO: Implement actual API call
-  return null;
+  const recipe = await prisma.recipe.findUnique({
+    where: { slug, isPublished: true },
+    include: {
+      gameType: true,
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+      ratings: {
+        where: { isApproved: true },
+        select: { rating: true },
+      },
+    },
+  });
+
+  if (!recipe) return null;
+
+  // Calculate average rating
+  const ratingCount = recipe.ratings.length;
+  const averageRating = ratingCount > 0
+    ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount
+    : 0;
+
+  return {
+    id: recipe.id,
+    title: recipe.title,
+    slug: recipe.slug,
+    description: recipe.description,
+    featuredImageUrl: recipe.featuredImageUrl,
+    galleryImages: (recipe.galleryImages as unknown as string[]) ?? [],
+    gameTypeId: recipe.gameTypeId,
+    prepTimeMinutes: recipe.prepTimeMinutes ?? 0,
+    cookTimeMinutes: recipe.cookTimeMinutes ?? 0,
+    totalTimeMinutes: recipe.totalTimeMinutes ?? 0,
+    servings: recipe.servings ?? 0,
+    ingredients: recipe.ingredients as unknown as Recipe['ingredients'],
+    instructions: recipe.instructions as unknown as Recipe['instructions'],
+    tips: recipe.tips,
+    videoUrl: recipe.videoUrl,
+    nutritionInfo: recipe.nutritionInfo as unknown as Recipe['nutritionInfo'],
+    viewCount: recipe.viewCount,
+    gameType: recipe.gameType ? {
+      id: recipe.gameType.id,
+      name: recipe.gameType.name,
+      slug: recipe.gameType.slug,
+    } : undefined,
+    categories: recipe.categories.map((c) => ({
+      id: c.category.id,
+      name: c.category.name,
+      slug: c.category.slug,
+    })),
+    averageRating,
+    ratingCount,
+    metaTitle: recipe.metaTitle,
+    metaDescription: recipe.metaDescription,
+    isFeatured: recipe.isFeatured,
+    isPublished: recipe.isPublished,
+    publishedAt: recipe.publishedAt,
+    createdAt: recipe.createdAt,
+    updatedAt: recipe.updatedAt,
+  } as Recipe;
 }
 
-async function getRelatedRecipes(recipeId: string): Promise<Recipe[]> {
-  // TODO: Implement actual API call
-  return [];
+async function getRelatedRecipes(recipeId: string, gameTypeId?: string): Promise<Recipe[]> {
+  const recipes = await prisma.recipe.findMany({
+    where: {
+      isPublished: true,
+      id: { not: recipeId },
+      ...(gameTypeId && { gameTypeId }),
+    },
+    include: {
+      gameType: true,
+      ratings: {
+        where: { isApproved: true },
+        select: { rating: true },
+      },
+    },
+    take: 4,
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  return recipes.map((recipe) => {
+    const ratingCount = recipe.ratings.length;
+    const averageRating = ratingCount > 0
+      ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount
+      : 0;
+
+    return {
+      id: recipe.id,
+      title: recipe.title,
+      slug: recipe.slug,
+      description: recipe.description,
+      featuredImageUrl: recipe.featuredImageUrl,
+      gameTypeId: recipe.gameTypeId,
+      prepTimeMinutes: recipe.prepTimeMinutes ?? 0,
+      cookTimeMinutes: recipe.cookTimeMinutes ?? 0,
+      totalTimeMinutes: recipe.totalTimeMinutes ?? 0,
+      servings: recipe.servings ?? 0,
+      viewCount: recipe.viewCount,
+      gameType: recipe.gameType ? {
+        id: recipe.gameType.id,
+        name: recipe.gameType.name,
+        slug: recipe.gameType.slug,
+      } : undefined,
+      averageRating,
+      ratingCount,
+    };
+  }) as Recipe[];
 }
 
 async function getRelatedProducts(): Promise<Product[]> {
-  // TODO: Implement actual API call
-  return [];
+  const products = await prisma.product.findMany({
+    where: { isActive: true, isFeatured: true },
+    take: 3,
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    featuredImageUrl: product.featuredImageUrl,
+    basePrice: Number(product.basePrice),
+    compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
+  })) as Product[];
 }
 
 export async function generateMetadata({ params }: RecipePageProps): Promise<Metadata> {
@@ -73,7 +189,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
     notFound();
   }
 
-  const relatedRecipes = await getRelatedRecipes(recipe.id);
+  const relatedRecipes = await getRelatedRecipes(recipe.id, recipe.gameType?.id);
   const relatedProducts = await getRelatedProducts();
 
   // Generate Recipe structured data

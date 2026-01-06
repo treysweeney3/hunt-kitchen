@@ -30,6 +30,8 @@ async function getProduct(id: string) {
     barcode: product.barcode ?? undefined,
     trackInventory: product.trackInventory,
     weightOz: product.weightOz ? Number(product.weightOz) : undefined,
+    featuredImageUrl: product.featuredImageUrl ?? undefined,
+    galleryImages: (product.galleryImages as string[]) ?? [],
     metaTitle: product.metaTitle ?? undefined,
     metaDescription: product.metaDescription ?? undefined,
     isActive: product.isActive,

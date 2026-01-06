@@ -29,6 +29,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import slugify from "slugify";
+import { ImageUpload } from "./ImageUpload";
+import { MultiImageUpload } from "./MultiImageUpload";
 
 const variantSchema = z.object({
   name: z.string(),
@@ -56,6 +58,8 @@ const productSchema = z.object({
   barcode: z.string().optional(),
   trackInventory: z.boolean().default(true),
   weightOz: z.coerce.number().optional(),
+  featuredImageUrl: z.string().nullable().optional(),
+  galleryImages: z.array(z.string()).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   isActive: z.boolean().default(true),
@@ -84,6 +88,8 @@ export function ProductEditor({ product, categories }: ProductEditorProps) {
       categoryId: "",
       basePrice: 0,
       trackInventory: true,
+      featuredImageUrl: null,
+      galleryImages: [],
       isActive: true,
       isFeatured: false,
       variants: [],
@@ -257,6 +263,60 @@ export function ProductEditor({ product, categories }: ProductEditorProps) {
                           {...field}
                           placeholder="Detailed product description..."
                           rows={6}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Images</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="featuredImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Featured Image</FormLabel>
+                      <FormDescription>
+                        Main product image shown in listings
+                      </FormDescription>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value}
+                          onChange={field.onChange}
+                          folder="products"
+                          aspectRatio={1}
+                          disabled={isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="galleryImages"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gallery Images</FormLabel>
+                      <FormDescription>
+                        Additional product images (drag to reorder)
+                      </FormDescription>
+                      <FormControl>
+                        <MultiImageUpload
+                          value={field.value || []}
+                          onChange={field.onChange}
+                          folder="products"
+                          maxImages={8}
+                          disabled={isSubmitting}
                         />
                       </FormControl>
                       <FormMessage />

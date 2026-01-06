@@ -4,8 +4,6 @@ import Image from 'next/image';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { ProductFiltersClient } from '@/components/shop/ProductFiltersClient';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Card, CardContent } from '@/components/ui/card';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -296,36 +294,28 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               <Link
                 key={category.id}
                 href={`/shop/category/${category.slug}`}
-                className="group"
+                className="group relative aspect-video overflow-hidden rounded-lg bg-stone shadow-sm transition-shadow hover:shadow-lg"
               >
-                <Card className="overflow-hidden transition-all hover:shadow-lg">
-                  <CardContent className="p-0">
-                    <AspectRatio ratio={16 / 9}>
-                      <div className="relative h-full w-full bg-stone">
-                        <Image
-                          src={getImageUrl(category.imageUrl, 'category')}
-                          alt={category.name}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-110"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-6">
-                          <h3 className="font-serif text-2xl font-bold text-white">
-                            {category.name}
-                          </h3>
-                          {category.description && (
-                            <p className="mt-1 text-sm text-stone">{category.description}</p>
-                          )}
-                          <div className="mt-3 flex items-center text-sm text-white">
-                            Shop Now
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </div>
-                        </div>
-                      </div>
-                    </AspectRatio>
-                  </CardContent>
-                </Card>
+                <Image
+                  src={getImageUrl(category.imageUrl, 'category')}
+                  alt={category.name}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="font-serif text-2xl font-bold text-white">
+                    {category.name}
+                  </h3>
+                  {category.description && (
+                    <p className="mt-1 text-sm text-stone">{category.description}</p>
+                  )}
+                  <div className="mt-3 flex items-center text-sm text-white">
+                    Shop Now
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </div>
+                </div>
               </Link>
             ))}
           </div>

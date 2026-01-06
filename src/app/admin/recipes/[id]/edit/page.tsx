@@ -25,6 +25,7 @@ async function getRecipe(id: string) {
     slug: recipe.slug,
     description: recipe.description,
     featuredImageUrl: recipe.featuredImageUrl ?? undefined,
+    galleryImages: (recipe.galleryImages as string[]) ?? [],
     gameTypeId: recipe.gameTypeId,
     categoryIds: recipe.categories.map((c) => c.categoryId),
     prepTimeMinutes: recipe.prepTimeMinutes ?? undefined,

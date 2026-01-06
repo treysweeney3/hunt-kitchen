@@ -30,6 +30,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import slugify from "slugify";
+import { ImageUpload } from "./ImageUpload";
+import { MultiImageUpload } from "./MultiImageUpload";
 
 const ingredientSchema = z.object({
   amount: z.string(),
@@ -47,7 +49,8 @@ const recipeSchema = z.object({
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().min(1, "Description is required"),
-  featuredImageUrl: z.string().optional(),
+  featuredImageUrl: z.string().nullable().optional(),
+  galleryImages: z.array(z.string()).optional(),
   gameTypeId: z.string().min(1, "Game type is required"),
   categoryIds: z.array(z.string()).min(1, "At least one category is required"),
   prepTimeMinutes: z.coerce.number().min(0).optional(),
@@ -81,6 +84,8 @@ export function RecipeEditor({ recipe, gameTypes, categories }: RecipeEditorProp
       title: "",
       slug: "",
       description: "",
+      featuredImageUrl: null,
+      galleryImages: [],
       gameTypeId: "",
       categoryIds: [],
       ingredients: [{ amount: "", unit: "", ingredient: "", notes: "" }],
@@ -273,6 +278,60 @@ export function RecipeEditor({ recipe, gameTypes, categories }: RecipeEditorProp
                     )}
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Images</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="featuredImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Featured Image</FormLabel>
+                      <FormDescription>
+                        Main recipe image shown in listings
+                      </FormDescription>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value}
+                          onChange={field.onChange}
+                          folder="recipes"
+                          aspectRatio={16 / 9}
+                          disabled={isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="galleryImages"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gallery Images</FormLabel>
+                      <FormDescription>
+                        Additional recipe photos (drag to reorder)
+                      </FormDescription>
+                      <FormControl>
+                        <MultiImageUpload
+                          value={field.value || []}
+                          onChange={field.onChange}
+                          folder="recipes"
+                          maxImages={8}
+                          disabled={isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 

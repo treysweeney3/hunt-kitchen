@@ -13,7 +13,7 @@ import {
   FolderTree,
   Settings,
   BarChart3,
-  PawPrint,
+  Target,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,7 +59,7 @@ const navigation = [
   {
     name: "Game Types",
     href: "/admin/game-types",
-    icon: PawPrint,
+    icon: Target,
   },
   {
     name: "Reports",
@@ -80,8 +80,7 @@ export function AdminSidebar() {
     <div className="flex h-full w-64 flex-col bg-[#2D5A3D] text-white">
       {/* Logo */}
       <div className="flex h-16 items-center justify-center border-b border-[#1e4a2d] px-6">
-        <Link href="/admin" className="flex items-center space-x-2">
-          <PawPrint className="h-8 w-8 text-[#E07C24]" />
+        <Link href="/admin">
           <span className="text-xl font-bold">THK Admin</span>
         </Link>
       </div>

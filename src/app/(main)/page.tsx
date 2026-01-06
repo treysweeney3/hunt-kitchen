@@ -2,27 +2,59 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ChefHat, ShoppingBag, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { RecipeGrid } from '@/components/recipes/RecipeGrid';
 import { ProductGrid } from '@/components/shop/ProductGrid';
 import { NewsletterForm } from '@/components/shared/NewsletterForm';
-import { siteConfig } from '@/config/site';
+import prisma from '@/lib/prisma';
 import type { Recipe, Product, GameType } from '@/types';
 
-// Mock data - Replace with actual API calls
 async function getFeaturedRecipes(): Promise<Recipe[]> {
-  // TODO: Implement actual API call
-  return [];
+  const recipes = await prisma.recipe.findMany({
+    where: { isPublished: true, isFeatured: true },
+    include: { gameType: true },
+    take: 4,
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  return recipes.map((recipe) => ({
+    id: recipe.id,
+    title: recipe.title,
+    slug: recipe.slug,
+    description: recipe.description,
+    featuredImageUrl: recipe.featuredImageUrl,
+    gameTypeId: recipe.gameTypeId,
+    prepTimeMinutes: recipe.prepTimeMinutes ?? 0,
+    cookTimeMinutes: recipe.cookTimeMinutes ?? 0,
+    totalTimeMinutes: recipe.totalTimeMinutes ?? 0,
+    servings: recipe.servings ?? 0,
+    viewCount: recipe.viewCount,
+    gameType: recipe.gameType ? {
+      id: recipe.gameType.id,
+      name: recipe.gameType.name,
+      slug: recipe.gameType.slug,
+    } : undefined,
+  })) as Recipe[];
 }
 
 async function getFeaturedProducts(): Promise<Product[]> {
-  // TODO: Implement actual API call
-  return [];
+  const products = await prisma.product.findMany({
+    where: { isActive: true, isFeatured: true },
+    take: 4,
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    featuredImageUrl: product.featuredImageUrl,
+    basePrice: Number(product.basePrice),
+    compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
+  })) as Product[];
 }
 
 async function getGameTypes(): Promise<GameType[]> {
-  // TODO: Implement actual API call
   return [
     {
       id: '1',
@@ -181,31 +213,23 @@ export default async function HomePage() {
               <Link
                 key={gameType.id}
                 href={`/recipes/game/${gameType.slug}`}
-                className="group"
+                className="group relative aspect-square overflow-hidden rounded-lg bg-stone shadow-sm transition-shadow hover:shadow-lg"
               >
-                <Card className="overflow-hidden transition-all hover:shadow-lg">
-                  <CardContent className="p-0">
-                    <AspectRatio ratio={1}>
-                      <div className="relative h-full w-full bg-stone">
-                        {gameType.imageUrl && (
-                          <Image
-                            src={gameType.imageUrl}
-                            alt={gameType.name}
-                            fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-110"
-                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
-                          <h3 className="font-semibold text-white text-sm sm:text-base">
-                            {gameType.name}
-                          </h3>
-                        </div>
-                      </div>
-                    </AspectRatio>
-                  </CardContent>
-                </Card>
+                {gameType.imageUrl && (
+                  <Image
+                    src={gameType.imageUrl}
+                    alt={gameType.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                  <h3 className="font-semibold text-white text-sm sm:text-base">
+                    {gameType.name}
+                  </h3>
+                </div>
               </Link>
             ))}
           </div>
