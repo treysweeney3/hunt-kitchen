@@ -9,7 +9,6 @@ import {
   User,
   ShoppingCart,
   Menu,
-  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -64,65 +63,31 @@ export function Header({ user }: HeaderProps) {
         <div className="container mx-auto px-4">
           <div className="flex h-20 items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-forestGreen">
-                <Image
-                  src="/images/logo-white.png"
-                  alt="The Hunt Kitchen"
-                  fill
-                  sizes="48px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              <span className="hidden font-serif text-xl font-bold text-forestGreen sm:block">
-                The Hunt Kitchen
-              </span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/images/logo-wide.png"
+                alt="The Hunt Kitchen"
+                width={200}
+                height={48}
+                className="h-12 w-auto"
+                priority
+              />
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden items-center space-x-8 lg:flex">
-              {navigation.main.map((item) =>
-                'children' in item && item.children ? (
-                  <DropdownMenu key={item.label}>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="font-semibold text-barkBrown hover:text-hunterOrange"
-                      >
-                        {item.label}
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="start"
-                      className="w-56 border-stone bg-cream"
-                    >
-                      {item.children.map((child) => (
-                        <DropdownMenuItem key={child.href} asChild>
-                          <Link
-                            href={child.href}
-                            className="cursor-pointer text-barkBrown hover:text-hunterOrange"
-                          >
-                            {child.label}
-                          </Link>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={cn(
-                      'font-semibold text-barkBrown transition-colors hover:text-hunterOrange',
-                      pathname === item.href && 'text-hunterOrange'
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                )
-              )}
+              {navigation.main.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={cn(
+                    'font-semibold text-forestGreen transition-colors hover:text-hunterOrange',
+                    pathname === item.href && 'text-hunterOrange'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
 
             {/* Actions */}
@@ -131,7 +96,7 @@ export function Header({ user }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-barkBrown hover:text-hunterOrange"
+                className="text-forestGreen hover:text-hunterOrange"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
               >
@@ -145,7 +110,7 @@ export function Header({ user }: HeaderProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-barkBrown hover:text-hunterOrange"
+                      className="text-forestGreen hover:text-hunterOrange"
                       aria-label="Account menu"
                     >
                       <User className="h-5 w-5" />
@@ -156,7 +121,7 @@ export function Header({ user }: HeaderProps) {
                     className="w-56 border-stone bg-cream"
                   >
                     <div className="px-2 py-1.5">
-                      <p className="text-sm font-medium text-barkBrown">
+                      <p className="text-sm font-medium text-forestGreen">
                         {user.name}
                       </p>
                       <p className="text-xs text-slate">{user.email}</p>
@@ -178,7 +143,7 @@ export function Header({ user }: HeaderProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href="/account/orders"
-                        className="cursor-pointer text-barkBrown hover:text-hunterOrange"
+                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
                         Orders
                       </Link>
@@ -186,7 +151,7 @@ export function Header({ user }: HeaderProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href="/account/settings"
-                        className="cursor-pointer text-barkBrown hover:text-hunterOrange"
+                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
                         Settings
                       </Link>
@@ -194,7 +159,7 @@ export function Header({ user }: HeaderProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href="/account/favorites"
-                        className="cursor-pointer text-barkBrown hover:text-hunterOrange"
+                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
                         Favorites
                       </Link>
@@ -216,7 +181,7 @@ export function Header({ user }: HeaderProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-barkBrown hover:text-hunterOrange"
+                      className="text-forestGreen hover:text-hunterOrange"
                       aria-label="Account menu"
                     >
                       <User className="h-5 w-5" />
@@ -229,7 +194,7 @@ export function Header({ user }: HeaderProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href={`/login?callbackUrl=${encodeURIComponent(pathname)}`}
-                        className="cursor-pointer text-barkBrown hover:text-hunterOrange"
+                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
                         Sign In
                       </Link>
@@ -237,7 +202,7 @@ export function Header({ user }: HeaderProps) {
                     <DropdownMenuItem asChild>
                       <Link
                         href={`/register?callbackUrl=${encodeURIComponent(pathname)}`}
-                        className="cursor-pointer text-barkBrown hover:text-hunterOrange"
+                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
                         Register
                       </Link>
@@ -250,7 +215,7 @@ export function Header({ user }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-barkBrown hover:text-hunterOrange"
+                className="relative text-forestGreen hover:text-hunterOrange"
                 onClick={() => setCartOpen(true)}
                 aria-label={`Shopping cart with ${cartItemCount} items`}
               >
@@ -269,7 +234,7 @@ export function Header({ user }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-barkBrown hover:text-hunterOrange lg:hidden"
+                className="text-forestGreen hover:text-hunterOrange lg:hidden"
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label="Open menu"
               >

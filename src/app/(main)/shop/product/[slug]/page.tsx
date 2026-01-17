@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { ProductGallery } from '@/components/shop/ProductGallery';
 import { ProductDetailsClient } from '@/components/shop/ProductDetailsClient';
 import { ProductGrid } from '@/components/shop/ProductGrid';
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -83,22 +82,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const productUrl = `${siteConfig.url}/shop/product/${slug}`;
   const productStructuredData = generateProductStructuredData(product as any, productUrl);
 
-  // Build breadcrumb items
-  const breadcrumbItems = [
-    { name: 'Shop', href: '/shop' },
-    ...(product.category ? [{ name: product.category.name, href: `/shop/category/${product.category.slug}` }] : []),
-    { name: product.name },
-  ];
-
   return (
     <div className="min-h-screen bg-cream py-8">
       {/* JSON-LD Structured Data */}
       <JsonLd data={productStructuredData as unknown as Record<string, unknown>} />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs with Structured Data */}
-        <Breadcrumbs items={breadcrumbItems} className="mb-6" />
-
         {/* Product Details Grid */}
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Product Gallery */}

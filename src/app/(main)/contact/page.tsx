@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Mail, Instagram, Facebook, Youtube } from 'lucide-react';
 import { toast } from 'sonner';
 import { siteConfig } from '@/config/site';
@@ -27,15 +26,25 @@ const Pinterest = ({ className }: { className?: string }) => (
 );
 
 type InquiryType = 'general' | 'business';
+type CollaborationType = 'sponsorship' | 'recipe' | 'product' | 'other' | '';
+
+interface ExtendedFormData extends ContactFormInput {
+  companyName: string;
+  jobTitle: string;
+  collaborationType: CollaborationType;
+}
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inquiryType, setInquiryType] = useState<InquiryType>('general');
-  const [formData, setFormData] = useState<ContactFormInput>({
+  const [formData, setFormData] = useState<ExtendedFormData>({
     name: '',
     email: '',
     subject: '',
     message: '',
+    companyName: '',
+    jobTitle: '',
+    collaborationType: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,6 +62,9 @@ export default function ContactPage() {
         email: '',
         subject: '',
         message: '',
+        companyName: '',
+        jobTitle: '',
+        collaborationType: '',
       });
       setInquiryType('general');
     } catch (error) {
@@ -107,22 +119,9 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-cream py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumb className="mb-8">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Contact</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="font-serif text-4xl font-bold text-barkBrown sm:text-5xl">
+          <h1 className="font-serif text-4xl font-bold text-forestGreen sm:text-5xl">
             Get in Touch
           </h1>
           <p className="mt-4 text-lg text-slate">
@@ -135,11 +134,13 @@ export default function ContactPage() {
             {/* Contact Form */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-serif text-2xl text-barkBrown">
+                <CardTitle className="font-serif text-2xl text-forestGreen">
                   Send us a Message
                 </CardTitle>
                 <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible.
+                  {inquiryType === 'business'
+                    ? "Tell us about your brand and collaboration ideas."
+                    : "Have a question or comment? We'd love to hear from you."}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -159,6 +160,54 @@ export default function ContactPage() {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Conditional Business Fields */}
+                  {inquiryType === 'business' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="companyName">Company/Brand Name *</Label>
+                        <Input
+                          id="companyName"
+                          name="companyName"
+                          type="text"
+                          value={formData.companyName}
+                          onChange={handleChange}
+                          placeholder="Your company or brand name"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="jobTitle">Your Role/Title</Label>
+                        <Input
+                          id="jobTitle"
+                          name="jobTitle"
+                          type="text"
+                          value={formData.jobTitle}
+                          onChange={handleChange}
+                          placeholder="e.g. Marketing Manager"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="collaborationType">Collaboration Type *</Label>
+                        <Select
+                          value={formData.collaborationType}
+                          onValueChange={(value: CollaborationType) =>
+                            setFormData((prev) => ({ ...prev, collaborationType: value }))
+                          }
+                        >
+                          <SelectTrigger id="collaborationType">
+                            <SelectValue placeholder="Select collaboration type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sponsorship">Sponsorship</SelectItem>
+                            <SelectItem value="recipe">Recipe Development</SelectItem>
+                            <SelectItem value="product">Product Collaboration</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="name">Name *</Label>
@@ -213,7 +262,7 @@ export default function ContactPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-forestGreen hover:bg-forestGreen/90"
+                    className="w-full bg-hunterOrange text-white hover:bg-hunterOrange/90"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -227,7 +276,7 @@ export default function ContactPage() {
               {/* Email & Social */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-serif text-2xl text-barkBrown">
+                  <CardTitle className="font-serif text-2xl text-forestGreen">
                     Contact Information
                   </CardTitle>
                 </CardHeader>
@@ -235,7 +284,7 @@ export default function ContactPage() {
                   <div className="flex items-start gap-3">
                     <Mail className="h-5 w-5 text-forestGreen mt-0.5" />
                     <div>
-                      <p className="font-semibold text-barkBrown">Email</p>
+                      <p className="font-semibold text-forestGreen">Email</p>
                       <a
                         href={`mailto:${siteConfig.links.email}`}
                         className="text-slate hover:text-hunterOrange transition-colors"
@@ -246,7 +295,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <p className="font-semibold text-barkBrown">Follow Us</p>
+                    <p className="font-semibold text-forestGreen">Follow Us</p>
                     <div className="flex gap-4">
                       <a
                         href={siteConfig.links.instagram}
@@ -292,7 +341,7 @@ export default function ContactPage() {
               {/* Business Hours */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-serif text-2xl text-barkBrown">
+                  <CardTitle className="font-serif text-2xl text-forestGreen">
                     Response Time
                   </CardTitle>
                 </CardHeader>
@@ -309,7 +358,7 @@ export default function ContactPage() {
 
           {/* FAQ Section */}
           <section className="mt-16">
-            <h2 className="mb-8 font-serif text-3xl font-bold text-barkBrown text-center">
+            <h2 className="mb-8 font-serif text-3xl font-bold text-forestGreen text-center">
               Frequently Asked Questions
             </h2>
             <Card>
@@ -317,7 +366,7 @@ export default function ContactPage() {
                 <Accordion type="single" collapsible className="w-full">
                   {faqs.map((faq, index) => (
                     <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left font-semibold text-barkBrown">
+                      <AccordionTrigger className="text-left font-semibold text-forestGreen">
                         {faq.question}
                       </AccordionTrigger>
                       <AccordionContent className="text-slate">

@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ProductGrid } from '@/components/shop/ProductGrid';
-import { ProductFiltersClient } from '@/components/shop/ProductFiltersClient';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -247,23 +245,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Hero Banner */}
-      <section className="relative h-80 w-full overflow-hidden bg-[#2D5A3D]">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/shop-hero.jpg"
-            alt="Shop merchandise"
-            fill
-            className="object-cover opacity-40"
-            priority
-          />
-        </div>
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl space-y-4 text-white">
+      {/* Hero Section */}
+      <section className="bg-forestGreen py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-white">
             <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl">
               Shop The Hunt Kitchen
             </h1>
-            <p className="text-xl text-stone">
+            <p className="mx-auto mt-4 max-w-2xl text-xl text-white/80">
               Quality gear and merchandise for passionate hunters and cooks
             </p>
           </div>
@@ -271,19 +260,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       </section>
 
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Shop</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
         {/* Category Navigation Cards */}
         <section className="mb-12">
           <h2 className="mb-6 font-serif text-2xl font-bold text-[#4A3728]">
@@ -365,15 +341,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-            {/* Filters Sidebar */}
-            <aside className="space-y-6">
-              <ProductFiltersClient />
-            </aside>
-
-            {/* Products Grid */}
-            <div className="space-y-6">
+          {/* Products Grid */}
+          <div className="space-y-6">
               {products.length > 0 ? (
                 <>
                   <div className="text-sm text-slate">
@@ -452,7 +421,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   )}
                 </div>
               )}
-            </div>
           </div>
         </section>
       </div>

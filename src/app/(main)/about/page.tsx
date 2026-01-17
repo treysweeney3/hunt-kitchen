@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Target, Heart, Leaf, Users } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
@@ -16,22 +15,13 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Hero Section */}
-      <section className="relative h-96 w-full overflow-hidden bg-[#2D5A3D]">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/about-hero.jpg"
-            alt="About The Hunt Kitchen"
-            fill
-            className="object-cover opacity-40"
-            priority
-          />
-        </div>
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl space-y-4 text-white">
+      <section className="bg-forestGreen py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-white">
             <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl">
               Our Story
             </h1>
-            <p className="text-xl text-stone">
+            <p className="mx-auto mt-4 max-w-2xl text-xl text-white/80">
               Honoring the hunt, celebrating the harvest, mastering the meal
             </p>
           </div>
@@ -39,19 +29,6 @@ export default function AboutPage() {
       </section>
 
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <Breadcrumb className="mb-8">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>About</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
         {/* Main Content */}
         <div className="mx-auto max-w-4xl space-y-16">
           {/* Our Mission Section */}
@@ -212,11 +189,11 @@ export default function AboutPage() {
           </section>
 
           {/* Call to Action */}
-          <section className="rounded-lg bg-[#2D5A3D] p-8 text-center text-white sm:p-12">
+          <section className="rounded-lg bg-forestGreen p-8 text-center text-white sm:p-12">
             <h2 className="font-serif text-3xl font-bold sm:text-4xl">
               Join Our Community
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-stone">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80">
               Connect with fellow hunters and wild game enthusiasts. Share recipes,
               techniques, and stories from the field.
             </p>

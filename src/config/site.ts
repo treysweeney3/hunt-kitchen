@@ -8,8 +8,9 @@ export const siteConfig = {
   links: {
     instagram: "https://instagram.com/the_hunt_kitchen",
     facebook: "https://www.facebook.com/p/The-Hunt-Kitchen-61576020279789/",
-    youtube: "https://youtube.com/@thehuntkitchen",
-    pinterest: "https://pinterest.com/thehuntkitchen",
+    youtube: "https://youtube.com/@TheHuntKitchen",
+    pinterest: "https://pinterest.com/the_hunt_kitchen",
+    tiktok: "https://tiktok.com/@the_hunt_kitchen",
     email: "info@thehuntkitchen.com",
   },
   creator: {
@@ -39,16 +40,9 @@ export const colors = {
 
 export const navigation = {
   main: [
-    { label: "Recipes", href: "/recipes" },
-    {
-      label: "Shop",
-      href: "/shop",
-      children: [
-        { label: "Cookbook", href: "/shop/category/cookbooks", featured: true },
-        { label: "Merch", href: "/shop/category/merch" },
-      ],
-    },
+    { label: "Shop", href: "/shop" },
     { label: "Content", href: "/content" },
+    { label: "Recipes", href: "/recipes" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],

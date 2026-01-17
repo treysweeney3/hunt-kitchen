@@ -7,7 +7,6 @@ import { InstructionSteps } from '@/components/recipes/InstructionSteps';
 import { RecipeRating } from '@/components/recipes/RecipeRating';
 import { RecipeGrid } from '@/components/recipes/RecipeGrid';
 import { ProductGrid } from '@/components/shop/ProductGrid';
-import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -196,13 +195,6 @@ export default async function RecipePage({ params }: RecipePageProps) {
   const recipeUrl = `${siteConfig.url}/recipes/${slug}`;
   const recipeStructuredData = generateRecipeStructuredData(recipe as any, recipeUrl);
 
-  // Build breadcrumb items
-  const breadcrumbItems = [
-    { name: 'Recipes', href: '/recipes' },
-    ...(recipe.gameType ? [{ name: recipe.gameType.name, href: `/recipes/game/${recipe.gameType.slug}` }] : []),
-    { name: recipe.title },
-  ];
-
   return (
     <div className="min-h-screen bg-cream">
       {/* JSON-LD Structured Data */}
@@ -212,9 +204,6 @@ export default async function RecipePage({ params }: RecipePageProps) {
       <RecipeHero recipe={recipe} />
 
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Breadcrumbs with Structured Data */}
-        <Breadcrumbs items={breadcrumbItems} className="mb-6" />
-
         {/* Main Content */}
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
           {/* Recipe Content */}

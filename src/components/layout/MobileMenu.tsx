@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { X, ChevronRight, User, ShoppingBag } from 'lucide-react';
@@ -11,7 +10,6 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import { navigation } from '@/config/site';
 import { cn } from '@/lib/utils';
@@ -28,15 +26,6 @@ interface MobileMenuProps {
 
 export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
   const pathname = usePathname();
-  const [openSections, setOpenSections] = useState<string[]>([]);
-
-  const toggleSection = (label: string) => {
-    setOpenSections((prev) =>
-      prev.includes(label)
-        ? prev.filter((item) => item !== label)
-        : [...prev, label]
-    );
-  };
 
   const handleLinkClick = () => {
     onClose();
@@ -54,7 +43,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-barkBrown hover:text-hunterOrange"
+              className="text-forestGreen hover:text-hunterOrange"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -71,7 +60,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                     <User className="h-5 w-5" />
                   </div>
                   <div className="flex-1 overflow-hidden">
-                    <p className="truncate font-semibold text-barkBrown">
+                    <p className="truncate font-semibold text-forestGreen">
                       {user.name}
                     </p>
                     <p className="truncate text-xs text-slate">{user.email}</p>
@@ -81,7 +70,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                   <Link
                     href="/account/orders"
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-barkBrown hover:bg-stone/30"
+                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:bg-stone/30"
                   >
                     <span>My Orders</span>
                     <ChevronRight className="h-4 w-4" />
@@ -89,7 +78,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                   <Link
                     href="/account/settings"
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-barkBrown hover:bg-stone/30"
+                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:bg-stone/30"
                   >
                     <span>Settings</span>
                     <ChevronRight className="h-4 w-4" />
@@ -97,7 +86,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                   <Link
                     href="/account/favorites"
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-barkBrown hover:bg-stone/30"
+                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:bg-stone/30"
                   >
                     <span>Favorites</span>
                     <ChevronRight className="h-4 w-4" />
@@ -136,57 +125,22 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
 
             {/* Navigation Links */}
             <nav className="space-y-2">
-              {navigation.main.map((item) =>
-                'children' in item && item.children ? (
-                  <Collapsible
-                    key={item.label}
-                    open={openSections.includes(item.label)}
-                    onOpenChange={() => toggleSection(item.label)}
-                  >
-                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg px-4 py-3 font-semibold text-barkBrown hover:bg-stone/30">
-                      <span>{item.label}</span>
-                      <ChevronRight
-                        className={cn(
-                          'h-5 w-5 transition-transform',
-                          openSections.includes(item.label) && 'rotate-90'
-                        )}
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-1 space-y-1 pl-4">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          onClick={handleLinkClick}
-                          className={cn(
-                            'flex items-center rounded-lg px-4 py-2 text-sm transition-colors',
-                            pathname === child.href
-                              ? 'bg-hunterOrange/10 text-hunterOrange'
-                              : 'text-slate hover:bg-stone/30 hover:text-barkBrown'
-                          )}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </CollapsibleContent>
-                  </Collapsible>
-                ) : (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    onClick={handleLinkClick}
-                    className={cn(
-                      'flex items-center justify-between rounded-lg px-4 py-3 font-semibold transition-colors',
-                      pathname === item.href
-                        ? 'bg-hunterOrange/10 text-hunterOrange'
-                        : 'text-barkBrown hover:bg-stone/30'
-                    )}
-                  >
-                    <span>{item.label}</span>
-                    <ChevronRight className="h-5 w-5" />
-                  </Link>
-                )
-              )}
+              {navigation.main.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleLinkClick}
+                  className={cn(
+                    'flex items-center justify-between rounded-lg px-4 py-3 font-semibold transition-colors',
+                    pathname === item.href
+                      ? 'bg-hunterOrange/10 text-hunterOrange'
+                      : 'text-forestGreen hover:bg-stone/30'
+                  )}
+                >
+                  <span>{item.label}</span>
+                  <ChevronRight className="h-5 w-5" />
+                </Link>
+              ))}
             </nav>
           </div>
 

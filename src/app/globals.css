@@ -135,3 +135,39 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* TikTok Embed Styling - Consistent rounded corners and no scrolling */
+.tiktok-wrapper {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.tiktok-embed,
+.tiktok-embed * {
+  border-radius: 12px !important;
+}
+
+.tiktok-embed {
+  overflow: hidden !important;
+  max-height: none !important;
+}
+
+.tiktok-embed iframe {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Target the TikTok embed container that gets generated */
+[data-e2e="embed-video"],
+[class*="DivVideoContainer"],
+[class*="DivContainer"] {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Additional selectors for TikTok's dynamically generated elements */
+.tiktok-embed > section,
+.tiktok-embed > div {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}

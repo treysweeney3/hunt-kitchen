@@ -43,33 +43,31 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-stone bg-stone/30">
+    <footer className="bg-forestGreen border-t border-white/20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="mb-4 flex items-center space-x-3">
-              <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-forestGreen">
-                <Image
-                  src="/images/thk-logo.png"
-                  alt="The Hunt Kitchen"
-                  fill
-                  sizes="48px"
-                  className="object-cover"
-                />
-              </div>
-              <span className="font-serif text-xl font-bold text-forestGreen">
+              <Image
+                src="/images/logo-white.png"
+                alt="The Hunt Kitchen"
+                width={48}
+                height={48}
+                className="h-12 w-auto"
+              />
+              <span className="font-serif text-xl font-bold text-white">
                 The Hunt Kitchen
               </span>
             </Link>
-            <p className="mb-6 text-sm text-slate">{siteConfig.tagline}</p>
+            <p className="mb-6 text-sm text-white/80">{siteConfig.tagline}</p>
 
             {/* Newsletter Signup */}
             <div className="mb-6">
-              <h3 className="mb-3 font-serif text-lg font-semibold text-barkBrown">
+              <h3 className="mb-3 font-serif text-lg font-semibold text-white">
                 Join Our Newsletter
               </h3>
-              <p className="mb-3 text-sm text-slate">
+              <p className="mb-3 text-sm text-white/80">
                 Get weekly recipes, cooking tips, and exclusive offers.
               </p>
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
@@ -79,7 +77,7 @@ export function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="border-stone bg-cream text-barkBrown placeholder:text-slate/60"
+                  className="border-white/20 bg-white/10 text-white placeholder:text-white/50"
                 />
                 <Button
                   type="submit"
@@ -97,7 +95,7 @@ export function Footer() {
                 href={siteConfig.links.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate transition-colors hover:text-hunterOrange"
+                className="text-white/80 transition-colors hover:text-hunterOrange"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
@@ -106,7 +104,7 @@ export function Footer() {
                 href={siteConfig.links.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate transition-colors hover:text-hunterOrange"
+                className="text-white/80 transition-colors hover:text-hunterOrange"
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
@@ -115,7 +113,7 @@ export function Footer() {
                 href={siteConfig.links.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate transition-colors hover:text-hunterOrange"
+                className="text-white/80 transition-colors hover:text-hunterOrange"
                 aria-label="YouTube"
               >
                 <Youtube className="h-5 w-5" />
@@ -124,7 +122,7 @@ export function Footer() {
                 href={siteConfig.links.pinterest}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate transition-colors hover:text-hunterOrange"
+                className="text-white/80 transition-colors hover:text-hunterOrange"
                 aria-label="Pinterest"
               >
                 <PinterestIcon className="h-5 w-5" />
@@ -134,7 +132,7 @@ export function Footer() {
 
           {/* Recipes Column */}
           <div>
-            <h3 className="mb-4 font-serif text-lg font-semibold text-barkBrown">
+            <h3 className="mb-4 font-serif text-lg font-semibold text-white">
               Recipes
             </h3>
             <ul className="space-y-2">
@@ -142,7 +140,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate transition-colors hover:text-hunterOrange"
+                    className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
                   >
                     {link.label}
                   </Link>
@@ -153,7 +151,7 @@ export function Footer() {
 
           {/* Shop Column */}
           <div>
-            <h3 className="mb-4 font-serif text-lg font-semibold text-barkBrown">
+            <h3 className="mb-4 font-serif text-lg font-semibold text-white">
               Shop
             </h3>
             <ul className="space-y-2">
@@ -161,7 +159,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate transition-colors hover:text-hunterOrange"
+                    className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
                   >
                     {link.label}
                   </Link>
@@ -172,7 +170,7 @@ export function Footer() {
 
           {/* Company Column */}
           <div>
-            <h3 className="mb-4 font-serif text-lg font-semibold text-barkBrown">
+            <h3 className="mb-4 font-serif text-lg font-semibold text-white">
               Company
             </h3>
             <ul className="space-y-2">
@@ -180,7 +178,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate transition-colors hover:text-hunterOrange"
+                    className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
                   >
                     {link.label}
                   </Link>
@@ -191,14 +189,14 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 border-t border-stone pt-8">
+        <div className="mt-12 border-t border-white/20 pt-8">
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <div className="flex flex-col items-center space-y-2 md:items-start">
-              <p className="text-sm text-slate">
+              <p className="text-sm text-white/70">
                 &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
                 reserved.
               </p>
-              <p className="text-sm text-slate">
+              <p className="text-sm text-white/70">
                 Powered by{' '}
                 <Link
                   href="https://deepsouthsoftware.com"
@@ -213,13 +211,13 @@ export function Footer() {
             <div className="flex space-x-6">
               <Link
                 href="/privacy"
-                className="text-sm text-slate transition-colors hover:text-hunterOrange"
+                className="text-sm text-white/70 transition-colors hover:text-hunterOrange"
               >
                 Privacy Policy
               </Link>
               <Link
                 href="/terms"
-                className="text-sm text-slate transition-colors hover:text-hunterOrange"
+                className="text-sm text-white/70 transition-colors hover:text-hunterOrange"
               >
                 Terms of Service
               </Link>
