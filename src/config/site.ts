@@ -20,15 +20,15 @@ export const siteConfig = {
 
 export const colors = {
   primary: {
-    forestGreen: "#2D5A3D",
-    hunterOrange: "#E07C24",
-    barkBrown: "#4A3728",
+    forestGreen: "#0f311f",
+    hunterOrange: "#ff6600",
+    barkBrown: "#03190e",
   },
   neutral: {
-    cream: "#F5F2EB",
-    stone: "#E8E4DD",
-    charcoal: "#333333",
-    slate: "#6B7280",
+    cream: "#c8b999",
+    stone: "#3d4b33",
+    charcoal: "#03190e",
+    slate: "#747355",
   },
   accent: {
     successGreen: "#22C55E",
@@ -39,26 +39,16 @@ export const colors = {
 
 export const navigation = {
   main: [
-    {
-      label: "Recipes",
-      href: "/recipes",
-      children: [
-        { label: "All Recipes", href: "/recipes" },
-        { label: "By Game Type", href: "/recipes/game" },
-        { label: "By Category", href: "/recipes/category" },
-        { label: "Featured Recipes", href: "/recipes?featured=true" },
-      ],
-    },
+    { label: "Recipes", href: "/recipes" },
     {
       label: "Shop",
       href: "/shop",
       children: [
-        { label: "All Products", href: "/shop" },
-        { label: "Apparel", href: "/shop/category/apparel" },
-        { label: "Cookbooks", href: "/shop/category/cookbooks" },
-        { label: "Accessories", href: "/shop/category/accessories" },
+        { label: "Cookbook", href: "/shop/category/cookbooks", featured: true },
+        { label: "Merch", href: "/shop/category/merch" },
       ],
     },
+    { label: "Content", href: "/content" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],
@@ -71,10 +61,8 @@ export const navigation = {
       { label: "Duck Recipes", href: "/recipes/game/duck" },
     ],
     shop: [
-      { label: "All Products", href: "/shop" },
-      { label: "Apparel", href: "/shop/category/apparel" },
-      { label: "Cookbooks", href: "/shop/category/cookbooks" },
-      { label: "Accessories", href: "/shop/category/accessories" },
+      { label: "Cookbook", href: "/shop/category/cookbooks" },
+      { label: "Merch", href: "/shop/category/merch" },
     ],
     company: [
       { label: "About Us", href: "/about" },

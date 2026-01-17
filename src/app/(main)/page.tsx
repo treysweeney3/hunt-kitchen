@@ -127,26 +127,37 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[600px] w-full overflow-hidden bg-gradient-to-br from-[#2D5A3D] via-[#3d6b4d] to-[#4A3728]">
+      <section className="relative h-[600px] w-full overflow-hidden bg-gradient-to-br from-forestGreen via-stone to-barkBrown">
         {/* Decorative pattern overlay */}
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.344 0L13.858 8.485 15.272 9.9l9.9-9.9h-2.828zM32 0l-3.657 3.657 1.414 1.414L searching 0H32zM0 5.373l.828-.83 1.415 1.415L0 8.2V5.374zm0 5.656l.828-.829 1.415 1.415L0 13.857v-2.83zm0 5.656l.828-.828 1.415 1.414L0 19.514v-2.83zm0 5.657l.828-.828 1.415 1.414L0 25.172v-2.83zM0 32l3.657-3.657 1.414 1.414L0 34.828V32zm60-28.627l-.828.83-1.415-1.415L60 0v2.373zm0 5.656l-.828.83-1.415-1.415L60 5.373v2.656zm0 5.657l-.828.828-1.415-1.414L60 11.03v2.656zm0 5.657l-.828.828-1.415-1.414L60 16.686v2.657zM60 32l-3.657-3.657-1.414 1.414L60 34.828V32z\' fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")' }} />
         <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl space-y-6 text-white">
-            <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl lg:text-7xl">
+            {/* Logo */}
+            <div className="mb-4">
+              <Image
+                src="/images/logo-white.png"
+                alt="The Hunt Kitchen"
+                width={160}
+                height={60}
+                className="h-auto w-auto max-w-[200px]"
+                priority
+              />
+            </div>
+            <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl lg:text-6xl">
               From Field to Fork
             </h1>
-            <p className="text-xl sm:text-2xl text-stone">
+            <p className="text-xl sm:text-2xl text-cream/80">
               Master the art of wild game cooking with expert recipes, techniques, and tips from The Hunt Kitchen.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="flex flex-wrap gap-4">
               <Button
                 asChild
                 size="lg"
-                className="bg-[#E07C24] text-white hover:bg-[#E07C24]/90"
+                className="bg-hunterOrange text-white hover:bg-hunterOrange/90"
               >
-                <Link href="/recipes">
-                  Explore Recipes
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                <Link href="/shop">
+                  Shop
+                  <ShoppingBag className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button
@@ -155,7 +166,15 @@ export default async function HomePage() {
                 variant="outline"
                 className="border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
               >
-                <Link href="/shop">Visit Shop</Link>
+                <Link href="/content">Content</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
+              >
+                <Link href="/recipes">Recipes</Link>
               </Button>
             </div>
           </div>
@@ -167,7 +186,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div>
-              <h2 className="font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold text-barkBrown sm:text-4xl">
                 Featured Recipes
               </h2>
               <p className="mt-2 text-lg text-slate">
@@ -186,7 +205,7 @@ export default async function HomePage() {
           ) : (
             <div className="rounded-lg border-2 border-dashed border-slate/30 bg-white/50 p-12 text-center">
               <ChefHat className="mx-auto h-12 w-12 text-slate/50" />
-              <h3 className="mt-4 font-semibold text-lg text-[#4A3728]">
+              <h3 className="mt-4 font-semibold text-lg text-barkBrown">
                 No featured recipes yet
               </h3>
               <p className="mt-2 text-slate">
@@ -201,7 +220,7 @@ export default async function HomePage() {
       <section className="bg-white py-16 sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
-            <h2 className="font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
+            <h2 className="font-serif text-3xl font-bold text-barkBrown sm:text-4xl">
               Browse by Game Type
             </h2>
             <p className="mt-2 text-lg text-slate">
@@ -241,7 +260,7 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div>
-              <h2 className="font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold text-barkBrown sm:text-4xl">
                 Featured Products
               </h2>
               <p className="mt-2 text-lg text-slate">
@@ -260,7 +279,7 @@ export default async function HomePage() {
           ) : (
             <div className="rounded-lg border-2 border-dashed border-slate/30 bg-white/50 p-12 text-center">
               <ShoppingBag className="mx-auto h-12 w-12 text-slate/50" />
-              <h3 className="mt-4 font-semibold text-lg text-[#4A3728]">
+              <h3 className="mt-4 font-semibold text-lg text-barkBrown">
                 No featured products yet
               </h3>
               <p className="mt-2 text-slate">
@@ -285,23 +304,23 @@ export default async function HomePage() {
               />
             </div>
             <div className="flex flex-col justify-center">
-              <h2 className="font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
+              <h2 className="font-serif text-3xl font-bold text-barkBrown sm:text-4xl">
                 About The Hunt Kitchen
               </h2>
-              <p className="mt-6 text-lg text-[#333333] leading-relaxed">
+              <p className="mt-6 text-lg text-charcoal leading-relaxed">
                 We're passionate hunters who believe that the harvest is just
                 the beginning. At The Hunt Kitchen, we transform wild game into
                 extraordinary meals that honor the animal and celebrate the
                 hunting tradition.
               </p>
-              <p className="mt-4 text-lg text-[#333333] leading-relaxed">
+              <p className="mt-4 text-lg text-charcoal leading-relaxed">
                 From field to fork, we'll guide you through every step of
                 preparing wild game with recipes that range from traditional
                 favorites to innovative culinary creations.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Button asChild size="lg">
-                  <Link href="/about" className="bg-[#2D5A3D] hover:bg-[#234a30]">
+                  <Link href="/about" className="bg-forestGreen hover:bg-forestGreen/90">
                     Our Story
                     <BookOpen className="ml-2 h-4 w-4" />
                   </Link>
@@ -316,20 +335,20 @@ export default async function HomePage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-[#2D5A3D] py-16 sm:py-20">
+      <section className="bg-forestGreen py-16 sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-bold text-white sm:text-4xl">
               Join The Hunt Kitchen Community
             </h2>
-            <p className="mt-4 text-lg text-stone">
+            <p className="mt-4 text-lg text-cream/80">
               Get weekly recipes, cooking tips, and exclusive offers delivered
               straight to your inbox.
             </p>
             <div className="mt-8 flex justify-center">
               <NewsletterForm />
             </div>
-            <p className="mt-4 text-sm text-stone">
+            <p className="mt-4 text-sm text-cream/80">
               We respect your privacy. Unsubscribe at any time.
             </p>
           </div>

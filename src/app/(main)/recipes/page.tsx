@@ -5,14 +5,13 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Search } from 'lucide-react';
 import type { Recipe, PaginatedResponse, RecipeFilters } from '@/types';
 import prisma from '@/lib/prisma';
 
 export const metadata: Metadata = {
-  title: 'Wild Game Recipes',
-  description: 'Browse our complete collection of wild game recipes including venison, elk, duck, and more.',
+  title: 'Top 10 Recipes',
+  description: 'Our top 10 featured wild game recipes including venison, elk, duck, and more.',
 };
 
 interface RecipesPageProps {
@@ -27,9 +26,9 @@ interface RecipesPageProps {
 }
 
 async function getRecipes(filters: RecipeFilters): Promise<PaginatedResponse<Recipe>> {
-  const page = filters.page || 1;
-  const limit = filters.limit || 12;
-  const skip = (page - 1) * limit;
+  const page = 1; // Always page 1 - no pagination for Top 10
+  const limit = 10; // Top 10 featured recipes only
+  const skip = 0;
 
   // Build orderBy
   let orderBy: any = { publishedAt: 'desc' };
@@ -48,8 +47,8 @@ async function getRecipes(filters: RecipeFilters): Promise<PaginatedResponse<Rec
       break;
   }
 
-  // Build where clause
-  const where: any = { isPublished: true };
+  // Build where clause - only featured recipes
+  const where: any = { isPublished: true, isFeatured: true };
   if (filters.search) {
     where.OR = [
       { title: { contains: filters.search, mode: 'insensitive' } },
@@ -179,11 +178,11 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-serif text-4xl font-bold text-[#4A3728] sm:text-5xl">
-            Wild Game Recipes
+          <h1 className="font-serif text-4xl font-bold text-barkBrown sm:text-5xl">
+            Top 10 Recipes
           </h1>
           <p className="mt-2 text-lg text-slate">
-            Explore our complete collection of recipes for cooking wild game
+            Our most popular wild game recipes, handpicked for you
           </p>
         </div>
 
@@ -227,69 +226,13 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
             {recipes.length > 0 ? (
               <>
                 <div className="text-sm text-slate">
-                  Showing {(pagination.page - 1) * pagination.limit + 1}-
-                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                  {pagination.total} recipes
+                  Showing {recipes.length} featured recipes
                 </div>
                 <RecipeGrid recipes={recipes} />
-
-                {/* Pagination */}
-                {pagination.totalPages > 1 && (
-                  <div className="mt-8 flex justify-center">
-                    <Pagination>
-                      <PaginationContent>
-                        {pagination.page > 1 && (
-                          <PaginationItem>
-                            <PaginationPrevious href={`/recipes?page=${pagination.page - 1}`} />
-                          </PaginationItem>
-                        )}
-
-                        {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                          .filter((pageNum) => {
-                            // Show first page, last page, current page, and pages around current
-                            return (
-                              pageNum === 1 ||
-                              pageNum === pagination.totalPages ||
-                              Math.abs(pageNum - pagination.page) <= 1
-                            );
-                          })
-                          .map((pageNum, idx, arr) => {
-                            // Add ellipsis if there's a gap
-                            const prevPageNum = arr[idx - 1];
-                            const showEllipsis = prevPageNum && pageNum - prevPageNum > 1;
-
-                            return (
-                              <div key={pageNum} className="flex">
-                                {showEllipsis && (
-                                  <PaginationItem>
-                                    <PaginationEllipsis />
-                                  </PaginationItem>
-                                )}
-                                <PaginationItem>
-                                  <PaginationLink
-                                    href={`/recipes?page=${pageNum}`}
-                                    isActive={pageNum === pagination.page}
-                                  >
-                                    {pageNum}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              </div>
-                            );
-                          })}
-
-                        {pagination.page < pagination.totalPages && (
-                          <PaginationItem>
-                            <PaginationNext href={`/recipes?page=${pagination.page + 1}`} />
-                          </PaginationItem>
-                        )}
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
               </>
             ) : (
               <div className="rounded-lg border-2 border-dashed border-slate/30 bg-white p-12 text-center">
-                <h3 className="font-semibold text-lg text-[#4A3728]">
+                <h3 className="font-semibold text-lg text-barkBrown">
                   No recipes found
                 </h3>
                 <p className="mt-2 text-slate">

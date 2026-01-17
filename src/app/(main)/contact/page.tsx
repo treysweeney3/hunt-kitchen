@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
@@ -25,8 +26,11 @@ const Pinterest = ({ className }: { className?: string }) => (
   </svg>
 );
 
+type InquiryType = 'general' | 'business';
+
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inquiryType, setInquiryType] = useState<InquiryType>('general');
   const [formData, setFormData] = useState<ContactFormInput>({
     name: '',
     email: '',
@@ -40,6 +44,7 @@ export default function ContactPage() {
 
     try {
       // TODO: Implement actual API call
+      // Include inquiryType in submission: { ...formData, inquiryType }
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       toast.success('Message sent successfully! We\'ll get back to you soon.');
@@ -49,6 +54,7 @@ export default function ContactPage() {
         subject: '',
         message: '',
       });
+      setInquiryType('general');
     } catch (error) {
       toast.error('Failed to send message. Please try again.');
     } finally {
@@ -116,7 +122,7 @@ export default function ContactPage() {
 
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="font-serif text-4xl font-bold text-[#4A3728] sm:text-5xl">
+          <h1 className="font-serif text-4xl font-bold text-barkBrown sm:text-5xl">
             Get in Touch
           </h1>
           <p className="mt-4 text-lg text-slate">
@@ -129,7 +135,7 @@ export default function ContactPage() {
             {/* Contact Form */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-serif text-2xl text-[#4A3728]">
+                <CardTitle className="font-serif text-2xl text-barkBrown">
                   Send us a Message
                 </CardTitle>
                 <CardDescription>
@@ -138,6 +144,22 @@ export default function ContactPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="inquiryType">Inquiry Type *</Label>
+                    <Select
+                      value={inquiryType}
+                      onValueChange={(value: InquiryType) => setInquiryType(value)}
+                    >
+                      <SelectTrigger id="inquiryType">
+                        <SelectValue placeholder="Select inquiry type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General Inquiry</SelectItem>
+                        <SelectItem value="business">Brand / Business Collaboration</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="name">Name *</Label>
                     <Input
@@ -191,7 +213,7 @@ export default function ContactPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#2D5A3D] hover:bg-[#234a30]"
+                    className="w-full bg-forestGreen hover:bg-forestGreen/90"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -205,18 +227,18 @@ export default function ContactPage() {
               {/* Email & Social */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-serif text-2xl text-[#4A3728]">
+                  <CardTitle className="font-serif text-2xl text-barkBrown">
                     Contact Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 text-[#2D5A3D] mt-0.5" />
+                    <Mail className="h-5 w-5 text-forestGreen mt-0.5" />
                     <div>
-                      <p className="font-semibold text-[#4A3728]">Email</p>
+                      <p className="font-semibold text-barkBrown">Email</p>
                       <a
                         href={`mailto:${siteConfig.links.email}`}
-                        className="text-slate hover:text-[#E07C24] transition-colors"
+                        className="text-slate hover:text-hunterOrange transition-colors"
                       >
                         {siteConfig.links.email}
                       </a>
@@ -224,13 +246,13 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <p className="font-semibold text-[#4A3728]">Follow Us</p>
+                    <p className="font-semibold text-barkBrown">Follow Us</p>
                     <div className="flex gap-4">
                       <a
                         href={siteConfig.links.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate hover:text-[#E07C24] transition-colors"
+                        className="text-slate hover:text-hunterOrange transition-colors"
                         aria-label="Instagram"
                       >
                         <Instagram className="h-6 w-6" />
@@ -239,7 +261,7 @@ export default function ContactPage() {
                         href={siteConfig.links.facebook}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate hover:text-[#E07C24] transition-colors"
+                        className="text-slate hover:text-hunterOrange transition-colors"
                         aria-label="Facebook"
                       >
                         <Facebook className="h-6 w-6" />
@@ -248,7 +270,7 @@ export default function ContactPage() {
                         href={siteConfig.links.youtube}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate hover:text-[#E07C24] transition-colors"
+                        className="text-slate hover:text-hunterOrange transition-colors"
                         aria-label="YouTube"
                       >
                         <Youtube className="h-6 w-6" />
@@ -257,7 +279,7 @@ export default function ContactPage() {
                         href={siteConfig.links.pinterest}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate hover:text-[#E07C24] transition-colors"
+                        className="text-slate hover:text-hunterOrange transition-colors"
                         aria-label="Pinterest"
                       >
                         <Pinterest className="h-6 w-6" />
@@ -270,7 +292,7 @@ export default function ContactPage() {
               {/* Business Hours */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-serif text-2xl text-[#4A3728]">
+                  <CardTitle className="font-serif text-2xl text-barkBrown">
                     Response Time
                   </CardTitle>
                 </CardHeader>
@@ -287,7 +309,7 @@ export default function ContactPage() {
 
           {/* FAQ Section */}
           <section className="mt-16">
-            <h2 className="mb-8 font-serif text-3xl font-bold text-[#4A3728] text-center">
+            <h2 className="mb-8 font-serif text-3xl font-bold text-barkBrown text-center">
               Frequently Asked Questions
             </h2>
             <Card>
@@ -295,7 +317,7 @@ export default function ContactPage() {
                 <Accordion type="single" collapsible className="w-full">
                   {faqs.map((faq, index) => (
                     <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left font-semibold text-[#4A3728]">
+                      <AccordionTrigger className="text-left font-semibold text-barkBrown">
                         {faq.question}
                       </AccordionTrigger>
                       <AccordionContent className="text-slate">

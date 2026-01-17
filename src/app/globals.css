@@ -46,13 +46,13 @@
   --radius-4xl: calc(var(--radius) + 16px);
 
   /* Hunt Kitchen Custom Colors */
-  --color-forestGreen: #2D5A3D;
-  --color-hunterOrange: #E07C24;
-  --color-barkBrown: #4A3728;
-  --color-cream: #F5F2EB;
-  --color-stone: #E8E4DD;
-  --color-charcoal: #333333;
-  --color-slate: #6B7280;
+  --color-forestGreen: #0f311f;
+  --color-hunterOrange: #ff6600;
+  --color-barkBrown: #03190e;
+  --color-cream: #c8b999;
+  --color-stone: #3d4b33;
+  --color-charcoal: #03190e;
+  --color-slate: #747355;
   --color-successGreen: #22C55E;
   --color-errorRed: #EF4444;
   --color-warningAmber: #F59E0B;
@@ -60,37 +60,37 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #F5F2EB; /* cream */
-  --foreground: #4A3728; /* barkBrown */
+  --background: #c8b999; /* cream */
+  --foreground: #03190e; /* barkBrown */
   --card: #FFFFFF;
-  --card-foreground: #4A3728; /* barkBrown */
+  --card-foreground: #03190e; /* barkBrown */
   --popover: #FFFFFF;
-  --popover-foreground: #4A3728; /* barkBrown */
-  --primary: #2D5A3D; /* forestGreen */
+  --popover-foreground: #03190e; /* barkBrown */
+  --primary: #0f311f; /* forestGreen */
   --primary-foreground: #FFFFFF;
-  --secondary: #E8E4DD; /* stone */
-  --secondary-foreground: #4A3728; /* barkBrown */
-  --muted: #E8E4DD; /* stone */
-  --muted-foreground: #6B7280; /* slate */
-  --accent: #E07C24; /* hunterOrange */
+  --secondary: #3d4b33; /* stone/olive */
+  --secondary-foreground: #c8b999; /* cream */
+  --muted: #3d4b33; /* stone/olive */
+  --muted-foreground: #747355; /* slate/khaki */
+  --accent: #ff6600; /* hunterOrange */
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444; /* errorRed */
-  --border: #E8E4DD; /* stone */
-  --input: #E8E4DD; /* stone */
-  --ring: #2D5A3D; /* forestGreen */
-  --chart-1: #2D5A3D; /* forestGreen */
-  --chart-2: #E07C24; /* hunterOrange */
-  --chart-3: #4A3728; /* barkBrown */
+  --border: #3d4b33; /* stone/olive */
+  --input: #3d4b33; /* stone/olive */
+  --ring: #0f311f; /* forestGreen */
+  --chart-1: #0f311f; /* forestGreen */
+  --chart-2: #ff6600; /* hunterOrange */
+  --chart-3: #03190e; /* barkBrown */
   --chart-4: #22C55E; /* successGreen */
   --chart-5: #F59E0B; /* warningAmber */
-  --sidebar: #2D5A3D; /* forestGreen */
+  --sidebar: #0f311f; /* forestGreen */
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #E07C24; /* hunterOrange */
+  --sidebar-primary: #ff6600; /* hunterOrange */
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1e4a2d; /* darker forestGreen */
+  --sidebar-accent: #03190e; /* darker forestGreen */
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #1e4a2d; /* darker forestGreen */
-  --sidebar-ring: #E07C24; /* hunterOrange */
+  --sidebar-border: #03190e; /* darker forestGreen */
+  --sidebar-ring: #ff6600; /* hunterOrange */
 }
 
 .dark {

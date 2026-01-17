@@ -51,7 +51,7 @@ export function Footer() {
             <Link href="/" className="mb-4 flex items-center space-x-3">
               <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-forestGreen">
                 <Image
-                  src="/images/thk-logo.jpg"
+                  src="/images/thk-logo.png"
                   alt="The Hunt Kitchen"
                   fill
                   sizes="48px"
