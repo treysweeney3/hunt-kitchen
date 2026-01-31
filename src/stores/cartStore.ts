@@ -1,8 +1,9 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface CartItemVariant {
-  id: number;
+  id: string; // Shopify global ID (gid://shopify/ProductVariant/123) or numeric string
+  title?: string; // Variant title (e.g., "Size: Large, Color: Black")
   size?: string;
   color?: string;
   sku: string;
@@ -11,7 +12,7 @@ export interface CartItemVariant {
 }
 
 export interface CartItemProduct {
-  id: number;
+  id: string; // Shopify global ID or numeric string
   name: string;
   slug: string;
   image_url?: string;
@@ -19,35 +20,68 @@ export interface CartItemProduct {
 }
 
 export interface CartItem {
-  product_id: number;
-  variant_id: number;
+  product_id: string; // Shopify global ID or numeric string
+  variant_id: string; // Shopify variant global ID or numeric string
   quantity: number;
   product: CartItemProduct;
   variant: CartItemVariant;
   added_at: string;
 }
 
-export interface DiscountCode {
-  code: string;
-  type: 'percentage' | 'fixed';
-  value: number;
-  min_order_amount?: number;
-  applied_at: string;
+// Legacy cart item type for migration (numeric IDs)
+interface LegacyCartItem {
+  product_id: number;
+  variant_id: number;
+  quantity: number;
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+    image_url?: string;
+    category?: string;
+  };
+  variant: {
+    id: number;
+    size?: string;
+    color?: string;
+    sku: string;
+    price: number;
+    compare_at_price?: number;
+  };
+  added_at: string;
+}
+
+// Input type for addItem - accepts both string and number IDs for backwards compatibility
+export interface AddItemInput {
+  product_id: string | number;
+  variant_id: string | number;
+  quantity: number;
+  product: {
+    id: string | number;
+    name: string;
+    slug: string;
+    image_url?: string;
+    category?: string;
+  };
+  variant: {
+    id: string | number;
+    title?: string;
+    size?: string;
+    color?: string;
+    sku: string;
+    price: number;
+    compare_at_price?: number;
+  };
 }
 
 interface CartState {
   items: CartItem[];
-  discount?: DiscountCode;
 
   // Actions
-  addItem: (item: Omit<CartItem, 'added_at'>) => void;
-  updateQuantity: (productId: number, variantId: number, quantity: number) => void;
-  removeItem: (productId: number, variantId: number) => void;
+  addItem: (item: AddItemInput) => void;
+  updateQuantity: (variantId: string, quantity: number) => void;
+  removeItem: (variantId: string) => void;
   clearCart: () => void;
-
-  // Discount actions
-  applyDiscount: (discount: Omit<DiscountCode, 'applied_at'>) => void;
-  removeDiscount: () => void;
 
   // Cart merge (for login)
   mergeCart: (serverItems: CartItem[]) => void;
@@ -55,23 +89,63 @@ interface CartState {
   // Computed values
   getItemCount: () => number;
   getSubtotal: () => number;
-  getDiscountAmount: () => number;
   getTotal: () => number;
-  getItem: (productId: number, variantId: number) => CartItem | undefined;
-  hasItem: (productId: number, variantId: number) => boolean;
+  getItem: (variantId: string) => CartItem | undefined;
+  hasItem: (variantId: string) => boolean;
+
+  // Shopify checkout helpers
+  getLineItems: () => Array<{ variantId: string; quantity: number }>;
+}
+
+// Helper to convert any ID to string
+function toStringId(id: string | number): string {
+  return String(id);
+}
+
+// Helper to migrate legacy cart items to new format
+function migrateCartItem(item: CartItem | LegacyCartItem): CartItem {
+  // Check if it's already a new format item (string IDs)
+  if (typeof item.product_id === "string") {
+    return item as CartItem;
+  }
+
+  // Migrate from legacy format
+  const legacyItem = item as LegacyCartItem;
+  return {
+    product_id: String(legacyItem.product_id),
+    variant_id: String(legacyItem.variant_id),
+    quantity: legacyItem.quantity,
+    product: {
+      id: String(legacyItem.product.id),
+      name: legacyItem.product.name,
+      slug: legacyItem.product.slug,
+      image_url: legacyItem.product.image_url,
+      category: legacyItem.product.category,
+    },
+    variant: {
+      id: String(legacyItem.variant.id),
+      size: legacyItem.variant.size,
+      color: legacyItem.variant.color,
+      sku: legacyItem.variant.sku,
+      price: legacyItem.variant.price,
+      compare_at_price: legacyItem.variant.compare_at_price,
+    },
+    added_at: legacyItem.added_at,
+  };
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-      discount: undefined,
 
       // Add item to cart or update quantity if already exists
       addItem: (item) => {
+        const variantId = toStringId(item.variant_id);
+
         set((state) => {
           const existingItemIndex = state.items.findIndex(
-            (i) => i.product_id === item.product_id && i.variant_id === item.variant_id
+            (i) => i.variant_id === variantId
           );
 
           if (existingItemIndex > -1) {
@@ -83,78 +157,62 @@ export const useCartStore = create<CartState>()(
             };
             return { items: updatedItems };
           } else {
-            // Add new item
-            return {
-              items: [
-                ...state.items,
-                {
-                  ...item,
-                  added_at: new Date().toISOString(),
-                },
-              ],
+            // Add new item with normalized string IDs
+            const newItem: CartItem = {
+              product_id: toStringId(item.product_id),
+              variant_id: variantId,
+              quantity: item.quantity,
+              product: {
+                id: toStringId(item.product.id),
+                name: item.product.name,
+                slug: item.product.slug,
+                image_url: item.product.image_url,
+                category: item.product.category,
+              },
+              variant: {
+                id: toStringId(item.variant.id),
+                title: item.variant.title,
+                size: item.variant.size,
+                color: item.variant.color,
+                sku: item.variant.sku,
+                price: item.variant.price,
+                compare_at_price: item.variant.compare_at_price,
+              },
+              added_at: new Date().toISOString(),
             };
+            return { items: [...state.items, newItem] };
           }
         });
       },
 
-      // Update item quantity
-      updateQuantity: (productId, variantId, quantity) => {
+      // Update item quantity by variant ID
+      updateQuantity: (variantId, quantity) => {
         set((state) => {
           if (quantity <= 0) {
             // Remove item if quantity is 0 or negative
             return {
-              items: state.items.filter(
-                (item) => !(item.product_id === productId && item.variant_id === variantId)
-              ),
+              items: state.items.filter((item) => item.variant_id !== variantId),
             };
           }
 
           const updatedItems = state.items.map((item) =>
-            item.product_id === productId && item.variant_id === variantId
-              ? { ...item, quantity }
-              : item
+            item.variant_id === variantId ? { ...item, quantity } : item
           );
 
           return { items: updatedItems };
         });
       },
 
-      // Remove item from cart
-      removeItem: (productId, variantId) => {
+      // Remove item from cart by variant ID
+      removeItem: (variantId) => {
         set((state) => ({
-          items: state.items.filter(
-            (item) => !(item.product_id === productId && item.variant_id === variantId)
-          ),
+          items: state.items.filter((item) => item.variant_id !== variantId),
         }));
       },
 
       // Clear entire cart
       clearCart: () => {
-        set({ items: [], discount: undefined });
-      },
-
-      // Apply discount code
-      applyDiscount: (discount) => {
-        const subtotal = get().getSubtotal();
-
-        // Check minimum order amount if specified
-        if (discount.min_order_amount && subtotal < discount.min_order_amount) {
-          throw new Error(
-            `Minimum order amount of $${discount.min_order_amount.toFixed(2)} required for this discount`
-          );
-        }
-
-        set({
-          discount: {
-            ...discount,
-            applied_at: new Date().toISOString(),
-          },
-        });
-      },
-
-      // Remove discount code
-      removeDiscount: () => {
-        set({ discount: undefined });
+        set({ items: [] });
       },
 
       // Merge cart when user logs in
@@ -165,16 +223,15 @@ export const useCartStore = create<CartState>()(
           // Add local items that aren't already in server cart
           state.items.forEach((localItem) => {
             const existingIndex = mergedItems.findIndex(
-              (item) =>
-                item.product_id === localItem.product_id &&
-                item.variant_id === localItem.variant_id
+              (item) => item.variant_id === localItem.variant_id
             );
 
             if (existingIndex > -1) {
               // Merge quantities for items that exist in both
               mergedItems[existingIndex] = {
                 ...mergedItems[existingIndex],
-                quantity: mergedItems[existingIndex].quantity + localItem.quantity,
+                quantity:
+                  mergedItems[existingIndex].quantity + localItem.quantity,
               };
             } else {
               // Add local-only items
@@ -198,50 +255,42 @@ export const useCartStore = create<CartState>()(
         }, 0);
       },
 
-      // Get discount amount
-      getDiscountAmount: () => {
-        const { discount } = get();
-        if (!discount) return 0;
-
-        const subtotal = get().getSubtotal();
-
-        if (discount.type === 'percentage') {
-          return (subtotal * discount.value) / 100;
-        } else {
-          // Fixed amount discount
-          return Math.min(discount.value, subtotal);
-        }
-      },
-
-      // Get total (after discount)
+      // Get total (no discount handling - Shopify handles discounts)
       getTotal: () => {
-        const subtotal = get().getSubtotal();
-        const discountAmount = get().getDiscountAmount();
-        return Math.max(0, subtotal - discountAmount);
+        return get().getSubtotal();
       },
 
-      // Get specific item
-      getItem: (productId, variantId) => {
-        return get().items.find(
-          (item) => item.product_id === productId && item.variant_id === variantId
-        );
+      // Get specific item by variant ID
+      getItem: (variantId) => {
+        return get().items.find((item) => item.variant_id === variantId);
       },
 
-      // Check if item exists in cart
-      hasItem: (productId, variantId) => {
-        return get().items.some(
-          (item) => item.product_id === productId && item.variant_id === variantId
-        );
+      // Check if item exists in cart by variant ID
+      hasItem: (variantId) => {
+        return get().items.some((item) => item.variant_id === variantId);
+      },
+
+      // Get line items for Shopify checkout
+      getLineItems: () => {
+        return get().items.map((item) => ({
+          variantId: item.variant_id,
+          quantity: item.quantity,
+        }));
       },
     }),
     {
-      name: 'hunt-kitchen-cart',
+      name: "hunt-kitchen-cart",
       storage: createJSONStorage(() => localStorage),
-      // Only persist items and discount, not computed values
+      // Only persist items, not computed values
       partialize: (state) => ({
         items: state.items,
-        discount: state.discount,
       }),
+      // Migrate old cart format on rehydration
+      onRehydrateStorage: () => (state) => {
+        if (state?.items) {
+          state.items = state.items.map(migrateCartItem);
+        }
+      },
     }
   )
 );

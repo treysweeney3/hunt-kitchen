@@ -2,81 +2,52 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { CartItem } from "@/components/shop/CartItem";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
-import { ShoppingBag, ArrowLeft, Tag } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CartPage() {
-  const router = useRouter();
-  const {
-    items,
-    isEmpty,
-    subtotal,
-    discountAmount,
-    total,
-    discount,
-    applyDiscount,
-    removeDiscount,
-  } = useCart();
+  const { items, isEmpty, subtotal, total, getLineItems } = useCart();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const [discountCode, setDiscountCode] = useState("");
-  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
-
-  const handleApplyDiscount = async () => {
-    if (!discountCode.trim()) {
-      toast.error("Please enter a discount code");
+  const handleCheckout = async () => {
+    if (isEmpty) {
+      toast.error("Your cart is empty");
       return;
     }
 
-    setIsApplyingDiscount(true);
+    setIsCheckingOut(true);
 
     try {
-      const response = await fetch("/api/cart/discount", {
+      const lineItems = getLineItems();
+
+      const response = await fetch("/api/shopify/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code: discountCode.trim() }),
+        body: JSON.stringify({ lineItems }),
       });
 
       const data = await response.json();
 
-      if (!response.ok || !data.success) {
-        toast.error(data.error || "Failed to apply discount code");
+      if (!response.ok) {
+        toast.error(data.error || "Failed to create checkout");
         return;
       }
 
-      // Apply discount to local cart
-      applyDiscount({
-        code: data.data.discountCode.code,
-        type: data.data.discountCode.discountType === "PERCENTAGE" ? "percentage" : "fixed",
-        value: data.data.discountCode.discountValue,
-      });
-
-      toast.success("Discount code applied successfully!");
-      setDiscountCode("");
+      // Redirect to Shopify checkout
+      window.location.href = data.checkoutUrl;
     } catch (error) {
-      console.error("Error applying discount:", error);
-      toast.error("Failed to apply discount code");
+      console.error("Checkout error:", error);
+      toast.error("Failed to create checkout. Please try again.");
     } finally {
-      setIsApplyingDiscount(false);
+      setIsCheckingOut(false);
     }
-  };
-
-  const handleRemoveDiscount = () => {
-    removeDiscount();
-    toast.success("Discount code removed");
-  };
-
-  const handleCheckout = () => {
-    router.push("/checkout");
   };
 
   if (isEmpty) {
@@ -91,8 +62,8 @@ export default function CartPage() {
               Your Cart is Empty
             </h1>
             <p className="mb-8 text-lg text-slate">
-              Looks like you haven't added any items to your cart yet. Start shopping to find your
-              favorite products!
+              Looks like you haven&apos;t added any items to your cart yet. Start
+              shopping to find your favorite products!
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
@@ -125,7 +96,9 @@ export default function CartPage() {
           </Link>
         </div>
 
-        <h1 className="mb-8 font-serif text-4xl font-bold text-barkBrown">Shopping Cart</h1>
+        <h1 className="mb-8 font-serif text-4xl font-bold text-barkBrown">
+          Shopping Cart
+        </h1>
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Cart Items */}
@@ -138,7 +111,7 @@ export default function CartPage() {
               </CardHeader>
               <CardContent className="space-y-0">
                 {items.map((item) => (
-                  <CartItem key={`${item.product_id}-${item.variant_id}`} item={item} />
+                  <CartItem key={item.variant_id} item={item} />
                 ))}
               </CardContent>
             </Card>
@@ -147,63 +120,6 @@ export default function CartPage() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-4 space-y-6">
-              {/* Discount Code */}
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-barkBrown">
-                    <Tag className="mr-2 h-5 w-5" />
-                    Discount Code
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {discount ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between rounded-lg bg-green-50 p-3">
-                        <div>
-                          <p className="font-semibold text-green-800">{discount.code}</p>
-                          <p className="text-sm text-green-600">
-                            {discount.type === "percentage"
-                              ? `${discount.value}% off`
-                              : `$${discount.value.toFixed(2)} off`}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleRemoveDiscount}
-                          className="text-green-700 hover:text-green-900"
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Input
-                        type="text"
-                        placeholder="Enter code"
-                        value={discountCode}
-                        onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleApplyDiscount();
-                          }
-                        }}
-                        disabled={isApplyingDiscount}
-                        className="flex-1"
-                      />
-                      <Button
-                        onClick={handleApplyDiscount}
-                        disabled={isApplyingDiscount || !discountCode.trim()}
-                        className="bg-forestGreen hover:bg-forestGreen/90"
-                      >
-                        Apply
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
               {/* Order Summary */}
               <Card className="bg-white">
                 <CardHeader>
@@ -217,17 +133,6 @@ export default function CartPage() {
                         ${subtotal.toFixed(2)}
                       </span>
                     </div>
-
-                    {discount && discountAmount > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-green-600">
-                          Discount ({discount.code})
-                        </span>
-                        <span className="font-medium text-green-600">
-                          -${discountAmount.toFixed(2)}
-                        </span>
-                      </div>
-                    )}
                   </div>
 
                   <Separator />
@@ -240,16 +145,27 @@ export default function CartPage() {
                   </div>
 
                   <p className="text-xs text-slate">
-                    Shipping and taxes calculated at checkout
+                    Shipping, taxes, and discounts calculated at checkout
                   </p>
 
                   <div className="space-y-3 pt-2">
                     <Button
                       onClick={handleCheckout}
+                      disabled={isCheckingOut || isEmpty}
                       className="w-full bg-hunterOrange text-white hover:bg-hunterOrange/90"
                       size="lg"
                     >
-                      Proceed to Checkout
+                      {isCheckingOut ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Creating Checkout...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          Proceed to Checkout
+                          <ExternalLink className="h-4 w-4" />
+                        </span>
+                      )}
                     </Button>
                     <Button
                       asChild

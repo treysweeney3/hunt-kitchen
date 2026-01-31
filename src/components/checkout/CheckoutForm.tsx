@@ -79,7 +79,7 @@ const SHIPPING_RATES: ShippingRate[] = [
 
 export function CheckoutForm() {
   const router = useRouter();
-  const { items, isEmpty, discount } = useCart();
+  const { items, isEmpty } = useCart();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedShippingRate, setSelectedShippingRate] = useState<ShippingRate | null>(null);
@@ -139,7 +139,6 @@ export function CheckoutForm() {
           billingAddress: data.sameAsShipping ? data.shippingAddress : data.billingAddress,
           sameAsShipping: data.sameAsShipping,
           shippingRate: selectedShippingRate,
-          discountCodeId: discount?.code,
         }),
       });
 

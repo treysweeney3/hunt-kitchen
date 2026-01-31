@@ -12,9 +12,9 @@ interface OrderSummaryProps {
 }
 
 export function OrderSummary({ shippingCost = 0, taxAmount = 0 }: OrderSummaryProps) {
-  const { items, subtotal, discountAmount, discount } = useCart();
+  const { items, subtotal, total } = useCart();
 
-  const totalBeforeTax = subtotal - discountAmount + shippingCost;
+  const totalBeforeTax = subtotal + shippingCost;
   const finalTotal = totalBeforeTax + taxAmount;
 
   return (
@@ -26,7 +26,7 @@ export function OrderSummary({ shippingCost = 0, taxAmount = 0 }: OrderSummaryPr
         {/* Cart Items */}
         <div className="space-y-3">
           {items.map((item) => {
-            const itemKey = `${item.product_id}-${item.variant_id}`;
+            const itemKey = item.variant_id;
             return (
               <div key={itemKey} className="flex gap-3">
                 <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-stone">
@@ -73,13 +73,6 @@ export function OrderSummary({ shippingCost = 0, taxAmount = 0 }: OrderSummaryPr
             <span className="text-slate">Subtotal</span>
             <span className="font-medium text-barkBrown">${subtotal.toFixed(2)}</span>
           </div>
-
-          {discount && discountAmount > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-green-600">Discount ({discount.code})</span>
-              <span className="font-medium text-green-600">-${discountAmount.toFixed(2)}</span>
-            </div>
-          )}
 
           <div className="flex justify-between text-sm">
             <span className="text-slate">Shipping</span>

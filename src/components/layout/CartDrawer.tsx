@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { useCart } from '@/hooks/useCart';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/hooks/useCart";
+import { cn } from "@/lib/utils";
 
 interface CartDrawerProps {
   open: boolean;
@@ -22,44 +22,49 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
-  const {
-    items,
-    isEmpty,
-    subtotal,
-    total,
-    updateQuantity,
-    removeItem,
-  } = useCart();
+  const { items, isEmpty, subtotal, total, updateQuantity, removeItem } =
+    useCart();
   const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
 
-  const handleUpdateQuantity = (
-    productId: number,
-    variantId: number,
-    newQuantity: number
-  ) => {
+  const handleUpdateQuantity = (variantId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
-    updateQuantity(productId, variantId, newQuantity);
+    updateQuantity(variantId, newQuantity);
   };
 
-  const handleRemoveItem = (productId: number, variantId: number) => {
-    const key = `${productId}-${variantId}`;
-    setRemovingItems((prev) => new Set(prev).add(key));
+  const handleRemoveItem = (variantId: string) => {
+    setRemovingItems((prev) => new Set(prev).add(variantId));
 
     setTimeout(() => {
-      removeItem(productId, variantId);
+      removeItem(variantId);
       setRemovingItems((prev) => {
         const next = new Set(prev);
-        next.delete(key);
+        next.delete(variantId);
         return next;
       });
     }, 200);
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(price);
+  };
+
+  // Build the product URL - for Shopify products use /shop/product/, for legacy use /shop/
+  const getProductUrl = (item: (typeof items)[0]) => {
+    return item.product_id.startsWith("gid://")
+      ? `/shop/product/${item.product.slug}`
+      : `/shop/${item.product.slug}`;
+  };
+
+  // Get variant display text
+  const getVariantDisplay = (item: (typeof items)[0]) => {
+    return (
+      item.variant.title ||
+      [item.variant.size, item.variant.color].filter(Boolean).join(" / ") ||
+      null
+    );
   };
 
   return (
@@ -103,20 +108,21 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             <ScrollArea className="flex-1 px-6 py-4">
               <div className="space-y-4">
                 {items.map((item) => {
-                  const itemKey = `${item.product_id}-${item.variant_id}`;
-                  const isRemoving = removingItems.has(itemKey);
+                  const isRemoving = removingItems.has(item.variant_id);
+                  const productUrl = getProductUrl(item);
+                  const variantDisplay = getVariantDisplay(item);
 
                   return (
                     <div
-                      key={itemKey}
+                      key={item.variant_id}
                       className={cn(
-                        'flex gap-4 rounded-lg bg-white p-4 transition-all duration-200',
-                        isRemoving && 'opacity-0 scale-95'
+                        "flex gap-4 rounded-lg bg-white p-4 transition-all duration-200",
+                        isRemoving && "scale-95 opacity-0"
                       )}
                     >
                       {/* Product Image */}
                       <Link
-                        href={`/shop/products/${item.product.slug}`}
+                        href={productUrl}
                         onClick={onClose}
                         className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-stone"
                       >
@@ -137,7 +143,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       {/* Product Details */}
                       <div className="flex flex-1 flex-col">
                         <Link
-                          href={`/shop/products/${item.product.slug}`}
+                          href={productUrl}
                           onClick={onClose}
                           className="font-semibold text-barkBrown hover:text-hunterOrange"
                         >
@@ -145,11 +151,9 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                         </Link>
 
                         {/* Variant Info */}
-                        {(item.variant.size || item.variant.color) && (
+                        {variantDisplay && (
                           <p className="mt-1 text-xs text-slate">
-                            {[item.variant.size, item.variant.color]
-                              .filter(Boolean)
-                              .join(' / ')}
+                            {variantDisplay}
                           </p>
                         )}
 
@@ -175,7 +179,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                               className="h-8 w-8 rounded-none text-barkBrown hover:text-hunterOrange"
                               onClick={() =>
                                 handleUpdateQuantity(
-                                  item.product_id,
                                   item.variant_id,
                                   item.quantity - 1
                                 )
@@ -193,7 +196,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                               className="h-8 w-8 rounded-none text-barkBrown hover:text-hunterOrange"
                               onClick={() =>
                                 handleUpdateQuantity(
-                                  item.product_id,
                                   item.variant_id,
                                   item.quantity + 1
                                 )
@@ -207,9 +209,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-errorRed hover:bg-errorRed/10 hover:text-errorRed"
-                            onClick={() =>
-                              handleRemoveItem(item.product_id, item.variant_id)
-                            }
+                            onClick={() => handleRemoveItem(item.variant_id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -253,7 +253,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       View Cart
                     </Button>
                   </Link>
-                  <Link href="/checkout" onClick={onClose} className="block">
+                  <Link href="/cart" onClick={onClose} className="block">
                     <Button className="w-full bg-hunterOrange text-white hover:bg-hunterOrange/90">
                       Checkout
                     </Button>

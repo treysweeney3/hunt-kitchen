@@ -23,7 +23,7 @@ export function CartItem({ item }: CartItemProps) {
 
     setIsUpdating(true);
     try {
-      updateQuantity(item.product_id, item.variant_id, newQuantity);
+      updateQuantity(item.variant_id, newQuantity);
       toast.success("Cart updated");
     } catch (error) {
       toast.error("Failed to update cart");
@@ -34,7 +34,7 @@ export function CartItem({ item }: CartItemProps) {
   };
 
   const handleRemove = () => {
-    removeItem(item.product_id, item.variant_id);
+    removeItem(item.variant_id);
     toast.success(`${item.product.name} removed from cart`);
   };
 
@@ -46,11 +46,26 @@ export function CartItem({ item }: CartItemProps) {
     ? (item.variant.compare_at_price! - item.variant.price) * item.quantity
     : 0;
 
+  // Build the product URL - for Shopify products use /shop/product/, for legacy use /shop/
+  const productUrl = item.product_id.startsWith("gid://")
+    ? `/shop/product/${item.product.slug}`
+    : `/shop/${item.product.slug}`;
+
+  // Get variant display text
+  const variantDisplay =
+    item.variant.title ||
+    [
+      item.variant.size && `Size: ${item.variant.size}`,
+      item.variant.color && `Color: ${item.variant.color}`,
+    ]
+      .filter(Boolean)
+      .join(" • ");
+
   return (
     <div className="flex gap-4 border-b py-6 last:border-b-0">
       {/* Product Image */}
       <Link
-        href={`/shop/${item.product.slug}`}
+        href={productUrl}
         className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-gray-100"
       >
         {item.product.image_url && (
@@ -69,18 +84,16 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex justify-between">
           <div className="flex-1">
             <Link
-              href={`/shop/${item.product.slug}`}
+              href={productUrl}
               className="font-semibold text-gray-900 hover:text-[#2D5A3D]"
             >
               {item.product.name}
             </Link>
 
             {/* Variant details */}
-            <div className="mt-1 flex flex-wrap gap-2 text-sm text-gray-500">
-              {item.variant.size && <span>Size: {item.variant.size}</span>}
-              {item.variant.size && item.variant.color && <span>•</span>}
-              {item.variant.color && <span>Color: {item.variant.color}</span>}
-            </div>
+            {variantDisplay && (
+              <div className="mt-1 text-sm text-gray-500">{variantDisplay}</div>
+            )}
 
             {item.variant.sku && (
               <p className="mt-1 text-xs text-gray-400">SKU: {item.variant.sku}</p>
