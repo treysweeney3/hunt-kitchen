@@ -1,0 +1,44 @@
+Brand & Visual Direction
+- Rugged, outdoors-inspired, food-focused
+- Clean and modern, not corporate or flashy
+
+Color Palette
+#0f311f
+#03190e
+#3d4b33
+#747355
+#c8b999
+
+### Site Navigation & Pages
+## Home
+- Strong visual hero with logo
+- Brief explanation of what The Hunt Kitchen is. I can also send them.(About us section)
+- Clear CTAs: Shop, Content, Recipes
+
+## Shop (Dropdown)
+- Cookbook
+- Merch
+- Emphasis on cookbook purchase
+
+## Content
+- Embedded YouTube videos
+- Links or embedded feeds for Instagram & TikTok
+- Clean, media-forward layout
+
+Only 10 featured recipes on the website (Top 10)
+## Recipes
+- Clean recipe pages with:
+    - Photo
+    - Ingredients
+    - Instructions
+
+## Contact
+- Two distinct inquiry paths:
+    - Brand / business collaborations
+    - General viewer inquiries
+- Either separate forms or a dropdown selector to route inquiries appropriately
+
+# Other Instructions
+- Main point of this website is to sell the cookbook/merch and promote content
+- Some recipes will be included, but most should be "paywalled" behind cookbook.
+    If there are too many on the site, who will buy the cookbook?

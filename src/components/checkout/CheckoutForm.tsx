@@ -403,7 +403,7 @@ export function CheckoutForm() {
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <FormControl>
-                      <RadioGroup onValueChange={field.onChange} defaultValue={field.value}>
+                      <RadioGroup onValueChange={field.onChange} value={field.value}>
                         {SHIPPING_RATES.map((rate) => (
                           <label
                             key={rate.id}

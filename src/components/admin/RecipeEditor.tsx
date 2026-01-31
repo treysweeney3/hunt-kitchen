@@ -216,13 +216,11 @@ export function RecipeEditor({ recipe, gameTypes, categories }: RecipeEditorProp
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Game Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a game type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a game type" />
+                        </SelectTrigger>
+                        <SelectContent position="popper" className="z-[9999]">
                           {gameTypes.map((type) => (
                             <SelectItem key={type.id} value={type.id}>
                               {type.name}

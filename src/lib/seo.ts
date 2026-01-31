@@ -139,14 +139,15 @@ export function generateMetadata(options: GenerateMetadataOptions = {}): Metadat
     title,
     description = siteConfig.description,
     keywords = [],
-    image = siteConfig.ogImage,
+    image,
     noIndex = false,
     canonical,
     type = 'website',
   } = options;
 
   const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
-  const imageUrl = image.startsWith('http') ? image : `${siteConfig.url}${image}`;
+  const resolvedImage = image || siteConfig.ogImage;
+  const imageUrl = resolvedImage.startsWith('http') ? resolvedImage : `${siteConfig.url}${resolvedImage}`;
 
   const metadata: Metadata = {
     title: pageTitle,
@@ -479,7 +480,7 @@ export function generateOrganizationStructuredData(): OrganizationStructuredData
       siteConfig.links.instagram,
       siteConfig.links.facebook,
       siteConfig.links.youtube,
-      siteConfig.links.pinterest,
+      siteConfig.links.tiktok,
     ],
     contactPoint: {
       '@type': 'ContactPoint',

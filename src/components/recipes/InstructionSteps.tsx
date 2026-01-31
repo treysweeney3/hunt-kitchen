@@ -88,11 +88,11 @@ export function InstructionSteps({
 
       {/* Instructions List */}
       <div className="space-y-6">
-        {sortedInstructions.map((instruction) => {
+        {sortedInstructions.map((instruction, index) => {
           const isCompleted = completedSteps.has(instruction.stepNumber);
           return (
             <div
-              key={instruction.stepNumber}
+              key={`instruction-${index}`}
               className={cn(
                 "relative flex gap-4 p-4 rounded-lg transition-all",
                 isCompleted
@@ -182,7 +182,7 @@ export function InstructionSteps({
               const isLast = index === sortedInstructions.length - 1;
 
               return (
-                <div key={instruction.stepNumber} className="flex items-center">
+                <div key={`timeline-${index}`} className="flex items-center">
                   <button
                     onClick={() => handleToggleStep(instruction.stepNumber)}
                     className="relative z-10"

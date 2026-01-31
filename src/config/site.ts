@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "The Hunt Kitchen",
-  tagline: "From Field to Fork - Master the Art of Wild Game Cooking",
+  tagline: "Hunt Hard | Eat Better - Master the Art of Wild Game Cooking",
   description:
     "Discover expert wild game recipes, cooking techniques, and merchandise for hunters who love to cook. From venison to wild boar, learn to transform your harvest into delicious meals.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://thehuntkitchen.com",
@@ -9,9 +9,8 @@ export const siteConfig = {
     instagram: "https://instagram.com/the_hunt_kitchen",
     facebook: "https://www.facebook.com/p/The-Hunt-Kitchen-61576020279789/",
     youtube: "https://youtube.com/@TheHuntKitchen",
-    pinterest: "https://pinterest.com/the_hunt_kitchen",
     tiktok: "https://tiktok.com/@the_hunt_kitchen",
-    email: "info@thehuntkitchen.com",
+    email: "thomas@thehuntkitchen.com",
   },
   creator: {
     name: "The Hunt Kitchen",
@@ -50,7 +49,7 @@ export const navigation = {
     recipes: [
       { label: "All Recipes", href: "/recipes" },
       { label: "Venison Recipes", href: "/recipes/game/venison" },
-      { label: "Elk Recipes", href: "/recipes/game/elk" },
+      { label: "Turkey Recipes", href: "/recipes/game/turkey" },
       { label: "Wild Boar Recipes", href: "/recipes/game/wild-boar" },
       { label: "Duck Recipes", href: "/recipes/game/duck" },
     ],
@@ -75,6 +74,7 @@ export const seo = {
     "wild game recipes",
     "venison recipes",
     "elk recipes",
+    "turkey recipes",
     "wild boar",
     "hunting recipes",
     "game meat cooking",

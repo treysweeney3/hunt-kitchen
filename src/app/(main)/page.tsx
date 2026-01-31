@@ -103,11 +103,11 @@ export default async function HomePage() {
                 priority
               />
             </div>
-            <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl lg:text-7xl">
-              From Field to Fork
+            <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl lg:text-6xl">
+              Hunt Hard | Eat Better
             </h1>
             <p className="mx-auto max-w-2xl text-xl sm:text-2xl text-white/90">
-              Master the art of wild game cooking with expert recipes, techniques, and tips from The Hunt Kitchen.
+              Master the art of wild game cooking with recipes, techniques, and tips from The Hunt Kitchen.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button

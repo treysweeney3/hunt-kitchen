@@ -40,8 +40,13 @@ export function Header({ user }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const cartItemCount = useCartItemCount();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -96,7 +101,7 @@ export function Header({ user }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-forestGreen hover:text-hunterOrange"
+                className="text-forestGreen hover:bg-transparent hover:text-hunterOrange"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
               >
@@ -104,13 +109,22 @@ export function Header({ user }: HeaderProps) {
               </Button>
 
               {/* User Account */}
-              {user ? (
+              {!mounted ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-forestGreen hover:bg-transparent hover:text-hunterOrange"
+                  aria-label="Account menu"
+                >
+                  <User className="h-5 w-5" />
+                </Button>
+              ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-forestGreen hover:text-hunterOrange"
+                      className="text-forestGreen hover:bg-transparent hover:text-hunterOrange"
                       aria-label="Account menu"
                     >
                       <User className="h-5 w-5" />
@@ -181,7 +195,7 @@ export function Header({ user }: HeaderProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-forestGreen hover:text-hunterOrange"
+                      className="text-forestGreen hover:bg-transparent hover:text-hunterOrange"
                       aria-label="Account menu"
                     >
                       <User className="h-5 w-5" />
@@ -215,7 +229,7 @@ export function Header({ user }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-forestGreen hover:text-hunterOrange"
+                className="relative text-forestGreen hover:bg-transparent hover:text-hunterOrange"
                 onClick={() => setCartOpen(true)}
                 aria-label={`Shopping cart with ${cartItemCount} items`}
               >
@@ -234,7 +248,7 @@ export function Header({ user }: HeaderProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-forestGreen hover:text-hunterOrange lg:hidden"
+                className="text-forestGreen hover:bg-transparent hover:text-hunterOrange lg:hidden"
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label="Open menu"
               >

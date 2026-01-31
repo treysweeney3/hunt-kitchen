@@ -34,7 +34,7 @@ export default function AboutPage() {
           {/* Our Mission Section */}
           <section>
             <h2 className="mb-6 font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
-              From Field to Fork
+              Hunt Hard | Eat Better
             </h2>
             <div className="space-y-4 text-lg text-[#333333] leading-relaxed">
               <p>
@@ -59,9 +59,46 @@ export default function AboutPage() {
             </div>
           </section>
 
+          {/* Team Section */}
+          <section>
+            <h2 className="mb-8 font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
+              Meet the Team
+            </h2>
+            <div className="space-y-12">
+              <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
+                  <Image
+                    src="/images/founder.jpeg"
+                    alt="Founder"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                  />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <h3 className="font-serif text-2xl font-bold text-[#4A3728]">
+                    Thomas Myers
+                  </h3>
+                  <p className="mt-1 text-lg text-[#E07C24]">Founder</p>
+                  <p className="mt-4 text-[#333333] leading-relaxed">
+                    Thomas Myers is the founder of The Hunt Kitchen, a wild game cooking brand built to
+                    inspire people to enjoy the outdoors and embrace hunting through everyday cooking.
+                    Having hunted for as long as he can remember, Thomas grew up pursuing everything
+                    from small to big game.
+                  </p>
+                  <p className="mt-4 text-[#333333] leading-relaxed">
+                    While in college, he began experimenting with flavors, techniques, and styles to make
+                    wild game approachable for anyone at the table. What started as curiosity quickly
+                    became a passion for showing just how versatile and flavorful wild game can be.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Values Grid */}
           <section>
-            <h2 className="mb-8 font-serif text-3xl font-bold text-[#4A3728] text-center sm:text-4xl">
+            <h2 className="mb-8 font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
               Our Values
             </h2>
             <div className="grid gap-6 sm:grid-cols-2">
@@ -126,65 +163,6 @@ export default function AboutPage() {
                   </p>
                 </CardContent>
               </Card>
-            </div>
-          </section>
-
-          {/* Image Gallery Section */}
-          <section>
-            <h2 className="mb-8 font-serif text-3xl font-bold text-[#4A3728] text-center sm:text-4xl">
-              A Glimpse Into Our World
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3, 4, 5, 6].map((index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square overflow-hidden rounded-lg bg-stone"
-                >
-                  <Image
-                    src={`/images/gallery/about-${index}.jpg`}
-                    alt={`Gallery image ${index}`}
-                    fill
-                    className="object-cover transition-transform duration-300 hover:scale-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Team Section */}
-          <section>
-            <h2 className="mb-8 font-serif text-3xl font-bold text-[#4A3728] text-center sm:text-4xl">
-              Meet the Team
-            </h2>
-            <div className="space-y-12">
-              <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src="/images/team/founder.jpg"
-                    alt="Founder"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                </div>
-                <div className="flex flex-col justify-center">
-                  <h3 className="font-serif text-2xl font-bold text-[#4A3728]">
-                    John Doe
-                  </h3>
-                  <p className="mt-1 text-lg text-[#E07C24]">Founder & Head Chef</p>
-                  <p className="mt-4 text-[#333333] leading-relaxed">
-                    John has been hunting since childhood and discovered his passion for
-                    wild game cooking in his early twenties. After years of experimenting
-                    in the kitchen and perfecting his craft, he founded The Hunt Kitchen
-                    to share his knowledge with fellow hunters and outdoor enthusiasts.
-                  </p>
-                  <p className="mt-4 text-[#333333] leading-relaxed">
-                    His philosophy is simple: every animal deserves to be prepared with
-                    care, creativity, and respect for the hunting tradition.
-                  </p>
-                </div>
-              </div>
             </div>
           </section>
 

@@ -86,14 +86,20 @@ export function RecipeHero({
     <div className={cn("relative", className)}>
       {/* Hero Image */}
       <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] bg-muted">
-        <Image
-          src={recipe.featuredImageUrl}
-          alt={recipe.title}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
+        {recipe.featuredImageUrl ? (
+          <Image
+            src={recipe.featuredImageUrl}
+            alt={recipe.title}
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[#2D5A3D]/20 flex items-center justify-center">
+            <span className="text-[#2D5A3D]/40 text-lg">No image available</span>
+          </div>
+        )}
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
