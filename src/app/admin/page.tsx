@@ -2,87 +2,34 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  ShoppingCart,
-  DollarSign,
-  AlertTriangle,
-  Package,
   Plus,
   BookOpen,
-  ShoppingBag,
+  Eye,
+  FolderTree,
+  Target,
 } from "lucide-react";
 import prisma from "@/lib/prisma";
-import { format } from "date-fns";
 
 async function getDashboardData() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
   const [
-    todayOrders,
-    todayRevenue,
-    pendingOrders,
-    lowStockProducts,
-    recentOrders,
+    totalRecipes,
+    publishedRecipes,
+    totalGameTypes,
+    totalCategories,
   ] = await Promise.all([
-    // Today's orders count
-    prisma.order.count({
-      where: {
-        createdAt: {
-          gte: today,
-        },
-      },
+    prisma.recipe.count(),
+    prisma.recipe.count({
+      where: { isPublished: true },
     }),
-    // Today's revenue
-    prisma.order.aggregate({
-      where: {
-        createdAt: {
-          gte: today,
-        },
-        paymentStatus: "PAID",
-      },
-      _sum: {
-        total: true,
-      },
-    }),
-    // Pending orders
-    prisma.order.count({
-      where: {
-        status: "PENDING",
-      },
-    }),
-    // Low stock products (less than 10 items)
-    prisma.productVariant.count({
-      where: {
-        inventoryQty: {
-          lt: 10,
-        },
-        isActive: true,
-      },
-    }),
-    // Recent orders
-    prisma.order.findMany({
-      take: 10,
-      orderBy: {
-        createdAt: "desc",
-      },
-      select: {
-        id: true,
-        orderNumber: true,
-        email: true,
-        total: true,
-        status: true,
-        paymentStatus: true,
-        createdAt: true,
-      },
-    }),
+    prisma.gameType.count(),
+    prisma.recipeCategory.count(),
   ]);
 
   return {
-    todayOrders,
-    todayRevenue: todayRevenue._sum.total || 0,
-    pendingOrders,
-    lowStockProducts,
-    recentOrders,
+    totalRecipes,
+    publishedRecipes,
+    totalGameTypes,
+    totalCategories,
   };
 }
 
@@ -93,20 +40,12 @@ export default async function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex gap-2">
-          <Button asChild>
-            <Link href="/admin/recipes/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Recipe
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/admin/products/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Product
-            </Link>
-          </Button>
-        </div>
+        <Button asChild>
+          <Link href="/admin/recipes/new">
+            <Plus className="mr-2 h-4 w-4" />
+            New Recipe
+          </Link>
+        </Button>
       </div>
 
       {/* Key Metrics */}
@@ -114,14 +53,14 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Today's Orders
+              Total Recipes
             </CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.todayOrders}</div>
+            <div className="text-2xl font-bold">{data.totalRecipes}</div>
             <p className="text-xs text-muted-foreground">
-              Orders placed today
+              All recipes in database
             </p>
           </CardContent>
         </Card>
@@ -129,16 +68,14 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Today's Revenue
+              Published Recipes
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              ${Number(data.todayRevenue).toFixed(2)}
-            </div>
+            <div className="text-2xl font-bold">{data.publishedRecipes}</div>
             <p className="text-xs text-muted-foreground">
-              Revenue from paid orders
+              Live on the website
             </p>
           </CardContent>
         </Card>
@@ -146,14 +83,14 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Pending Orders
+              Game Types
             </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.pendingOrders}</div>
+            <div className="text-2xl font-bold">{data.totalGameTypes}</div>
             <p className="text-xs text-muted-foreground">
-              Awaiting processing
+              Types of wild game
             </p>
           </CardContent>
         </Card>
@@ -161,14 +98,14 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Low Stock Alerts
+              Categories
             </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <FolderTree className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.lowStockProducts}</div>
+            <div className="text-2xl font-bold">{data.totalCategories}</div>
             <p className="text-xs text-muted-foreground">
-              Products with low inventory
+              Recipe categories
             </p>
           </CardContent>
         </Card>
@@ -187,77 +124,44 @@ export default async function AdminDashboard() {
             </Link>
           </Button>
           <Button variant="outline" className="h-auto flex-col py-4" asChild>
-            <Link href="/admin/products/new">
-              <ShoppingBag className="mb-2 h-6 w-6" />
-              <span>Add Product</span>
+            <Link href="/admin/recipes">
+              <Eye className="mb-2 h-6 w-6" />
+              <span>View Recipes</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto flex-col py-4" asChild>
-            <Link href="/admin/orders">
-              <ShoppingCart className="mb-2 h-6 w-6" />
-              <span>View Orders</span>
+            <Link href="/admin/game-types">
+              <Target className="mb-2 h-6 w-6" />
+              <span>Manage Game Types</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto flex-col py-4" asChild>
-            <Link href="/admin/customers">
-              <Plus className="mb-2 h-6 w-6" />
-              <span>Manage Customers</span>
+            <Link href="/admin/categories">
+              <FolderTree className="mb-2 h-6 w-6" />
+              <span>Manage Categories</span>
             </Link>
           </Button>
         </CardContent>
       </Card>
 
-      {/* Recent Activity */}
+      {/* Shop Note */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
+          <CardTitle>Shop Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {data.recentOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-              >
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">
-                    Order #{order.orderNumber}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {order.email}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {format(new Date(order.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                  </p>
-                </div>
-                <div className="text-right space-y-1">
-                  <p className="text-sm font-medium">
-                    ${Number(order.total).toFixed(2)}
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
-                      {order.status}
-                    </span>
-                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                      {order.paymentStatus}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {data.recentOrders.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-8">
-                No orders yet
-              </p>
-            )}
-          </div>
-          {data.recentOrders.length > 0 && (
-            <div className="mt-4">
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/admin/orders">View All Orders</Link>
-              </Button>
-            </div>
-          )}
+          <p className="text-muted-foreground">
+            Products, orders, customers, and discounts are managed through{" "}
+            <a
+              href="https://admin.shopify.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline hover:no-underline"
+            >
+              Shopify Admin
+            </a>
+            .
+          </p>
         </CardContent>
       </Card>
     </div>

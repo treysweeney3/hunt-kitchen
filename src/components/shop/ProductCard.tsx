@@ -86,7 +86,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const hasSecondaryImage = galleryImages.length > 0;
 
   return (
-    <Card className="group relative overflow-hidden transition-shadow hover:shadow-lg">
+    <Card className="group relative flex h-full flex-col gap-0 overflow-hidden py-0 transition-shadow hover:shadow-lg">
       <Link href={`/shop/${product.slug}`}>
         <AspectRatio ratio={3 / 4}>
           <div
@@ -120,9 +120,9 @@ export function ProductCard({ product }: ProductCardProps) {
         </AspectRatio>
       </Link>
 
-      <CardContent className="p-4">
+      <CardContent className="flex flex-grow flex-col p-3">
         <Link href={`/shop/${product.slug}`}>
-          <h3 className="mb-2 font-semibold text-gray-900 transition-colors hover:text-[#2D5A3D]">
+          <h3 className="mb-1 font-semibold text-gray-900 transition-colors hover:text-[#2D5A3D]">
             {product.name}
           </h3>
         </Link>
@@ -143,15 +143,9 @@ export function ProductCard({ product }: ProductCardProps) {
             ${displayPrice.toFixed(2)}
           </span>
         </div>
-
-        {hasMultipleOptions && (
-          <p className="mt-2 text-sm text-gray-500">
-            {uniqueOptions.size} {primaryVariant?.option1Name?.toLowerCase() || "option"}s available
-          </p>
-        )}
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="mt-auto p-3 pt-0">
         {!hasMultipleOptions && !isSoldOut ? (
           <Button
             onClick={handleQuickAdd}
@@ -164,11 +158,10 @@ export function ProductCard({ product }: ProductCardProps) {
           <Button
             asChild
             disabled={isSoldOut}
-            className="w-full bg-[#2D5A3D] hover:bg-[#234a30]"
-            variant={isSoldOut ? "outline" : "default"}
+            className={`w-full ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
           >
             <Link href={`/shop/${product.slug}`}>
-              {isSoldOut ? "Sold Out" : "View Options"}
+              {isSoldOut ? "Sold Out" : "View Product"}
             </Link>
           </Button>
         )}

@@ -51,7 +51,6 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
 interface EmailPreferences {
-  orderUpdates: boolean;
   newRecipes: boolean;
   promotions: boolean;
   newsletter: boolean;
@@ -66,7 +65,6 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const [emailPreferences, setEmailPreferences] = useState<EmailPreferences>({
-    orderUpdates: true,
     newRecipes: true,
     promotions: false,
     newsletter: false,
@@ -402,24 +400,6 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <label className="text-sm font-medium">Order Updates</label>
-                  <p className="text-sm text-gray-500">
-                    Receive notifications about your orders and shipments
-                  </p>
-                </div>
-                <Switch
-                  checked={emailPreferences.orderUpdates}
-                  onCheckedChange={(checked) =>
-                    updateEmailPreference("orderUpdates", checked)
-                  }
-                  disabled={updatingPreferences}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
                   <label className="text-sm font-medium">New Recipes</label>
                   <p className="text-sm text-gray-500">
                     Get notified when we publish new wild game recipes
@@ -487,7 +467,7 @@ export default function SettingsPage() {
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
               Once you delete your account, there is no going back. This action cannot be
-              undone. All your data, including orders, saved recipes, and addresses will
+              undone. All your data, including saved recipes and account preferences will
               be permanently deleted.
             </p>
             <Button
@@ -510,9 +490,7 @@ export default function SettingsPage() {
               This action cannot be undone. This will permanently delete your account and
               remove all your data from our servers including:
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Order history</li>
                 <li>Saved recipes</li>
-                <li>Saved addresses</li>
                 <li>Account preferences</li>
               </ul>
             </AlertDialogDescription>

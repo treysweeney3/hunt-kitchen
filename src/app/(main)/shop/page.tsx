@@ -46,8 +46,6 @@ async function getShopifyProducts(params: {
   hasNextPage: boolean;
 }> {
   console.log("[Shop] isShopifyConfigured:", isShopifyConfigured());
-  console.log("[Shop] SHOPIFY_STORE_DOMAIN:", process.env.SHOPIFY_STORE_DOMAIN);
-  console.log("[Shop] SHOPIFY_STOREFRONT_ACCESS_TOKEN exists:", !!process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN);
 
   if (!isShopifyConfigured()) {
     console.log("[Shop] Shopify not configured, returning empty");
@@ -61,7 +59,6 @@ async function getShopifyProducts(params: {
       search: params.search || undefined,
       // available: true,  // Commented out for debugging
     });
-    console.log("[Shop] Query:", query, "SortKey:", sortKey, "Reverse:", reverse);
 
     // Shopify's cursor-based pagination requires fetching all previous pages
     // For simplicity, we fetch more products and slice for the current page
@@ -77,7 +74,6 @@ async function getShopifyProducts(params: {
     const startIndex = (params.page - 1) * PRODUCTS_PER_PAGE;
     const pageProducts = products.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
 
-    console.log("[Shop] Fetched", products.length, "products from Shopify");
     return {
       products: pageProducts,
       totalCount: products.length,

@@ -19,22 +19,10 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
   // Determine if product is sold out
   const isSoldOut = !product.availableForSale;
 
-  // Check if product has multiple variants
-  const hasMultipleVariants = product.variants.length > 1;
-
   // Determine if there's a sale
   const isOnSale =
     product.compareAtPrice !== null && product.price < product.compareAtPrice;
 
-  // Get available options (variants that are in stock)
-  const availableVariants = product.variants.filter((v) => v.availableForSale);
-  const variantCount = availableVariants.length;
-
-  // Get option label for display (e.g., "3 sizes available")
-  const optionLabel =
-    product.options.length > 0 && hasMultipleVariants
-      ? `${variantCount} ${product.options[0].name.toLowerCase()}${variantCount !== 1 ? "s" : ""} available`
-      : null;
 
   // Images for hover effect
   const featuredImage = product.featuredImage?.url || "/placeholder-product.jpg";
@@ -50,7 +38,7 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
   };
 
   return (
-    <Card className="group relative overflow-hidden transition-shadow hover:shadow-lg">
+    <Card className="group relative flex h-full flex-col gap-0 overflow-hidden py-0 transition-shadow hover:shadow-lg">
       <Link href={`/shop/product/${product.handle}`}>
         <AspectRatio ratio={3 / 4}>
           <div
@@ -82,9 +70,9 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
         </AspectRatio>
       </Link>
 
-      <CardContent className="p-4">
+      <CardContent className="flex flex-grow flex-col p-3">
         <Link href={`/shop/product/${product.handle}`}>
-          <h3 className="mb-2 font-semibold text-gray-900 transition-colors hover:text-[#2D5A3D]">
+          <h3 className="mb-1 font-semibold text-gray-900 transition-colors hover:text-[#2D5A3D]">
             {product.title}
           </h3>
         </Link>
@@ -104,24 +92,16 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
           </span>
         </div>
 
-        {optionLabel && (
-          <p className="mt-2 text-sm text-gray-500">{optionLabel}</p>
-        )}
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="mt-auto p-3 pt-0">
         <Button
           asChild
           disabled={isSoldOut}
-          className="w-full bg-[#2D5A3D] hover:bg-[#234a30]"
-          variant={isSoldOut ? "outline" : "default"}
+          className={`w-full ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
         >
           <Link href={`/shop/product/${product.handle}`}>
-            {isSoldOut
-              ? "Sold Out"
-              : hasMultipleVariants
-                ? "View Options"
-                : "View Product"}
+            {isSoldOut ? "Sold Out" : "View Product"}
           </Link>
         </Button>
       </CardFooter>

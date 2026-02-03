@@ -6,10 +6,6 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   BookOpen,
-  ShoppingBag,
-  ShoppingCart,
-  Users,
-  Tag,
   FolderTree,
   Settings,
   BarChart3,
@@ -30,26 +26,6 @@ const navigation = [
     name: "Recipes",
     href: "/admin/recipes",
     icon: BookOpen,
-  },
-  {
-    name: "Products",
-    href: "/admin/products",
-    icon: ShoppingBag,
-  },
-  {
-    name: "Orders",
-    href: "/admin/orders",
-    icon: ShoppingCart,
-  },
-  {
-    name: "Customers",
-    href: "/admin/customers",
-    icon: Users,
-  },
-  {
-    name: "Discounts",
-    href: "/admin/discounts",
-    icon: Tag,
   },
   {
     name: "Categories",

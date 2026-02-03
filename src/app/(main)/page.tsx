@@ -3,13 +3,14 @@ import Image from 'next/image';
 import { ArrowRight, ChefHat, ShoppingBag, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RecipeGrid } from '@/components/recipes/RecipeGrid';
-import { ProductGrid } from '@/components/shop/ProductGrid';
+import { ShopifyProductGrid } from '@/components/shop/ShopifyProductGrid';
 import { NewsletterForm } from '@/components/shared/NewsletterForm';
 import { GameTypeCarousel } from '@/components/shared/GameTypeCarousel';
 import { TikTokGrid } from '@/components/content/TikTokEmbed';
 import { siteConfig } from '@/config/site';
 import prisma from '@/lib/prisma';
-import type { Recipe, Product } from '@/types';
+import { getProductsByHandles, isShopifyConfigured } from '@/lib/shopify';
+import type { Recipe } from '@/types';
 
 // TikTok icon component
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -57,27 +58,19 @@ async function getFeaturedRecipes(): Promise<Recipe[]> {
   })) as Recipe[];
 }
 
-async function getFeaturedProducts(): Promise<Product[]> {
-  const products = await prisma.product.findMany({
-    where: { isActive: true, isFeatured: true },
-    take: 4,
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    slug: product.slug,
-    description: product.description,
-    featuredImageUrl: product.featuredImageUrl,
-    basePrice: Number(product.basePrice),
-    compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : null,
-  })) as Product[];
-}
+// Featured product handles for the landing page
+const FEATURED_PRODUCT_HANDLES = [
+  "cookbook-venison-edition",
+  "tshirt", // The Hunt Kitchen Mossy Oak Hat
+  "full-logo-t-shirt",
+  "logo-hoodie",
+];
 
 export default async function HomePage() {
-  const featuredRecipes = await getFeaturedRecipes();
-  const featuredProducts = await getFeaturedProducts();
+  const [featuredRecipes, featuredProducts] = await Promise.all([
+    getFeaturedRecipes(),
+    isShopifyConfigured() ? getProductsByHandles(FEATURED_PRODUCT_HANDLES) : Promise.resolve([]),
+  ]);
 
   return (
     <div className="flex flex-col">
@@ -209,7 +202,7 @@ export default async function HomePage() {
             </Button>
           </div>
           {featuredProducts.length > 0 ? (
-            <ProductGrid products={featuredProducts} />
+            <ShopifyProductGrid products={featuredProducts} />
           ) : (
             <div className="rounded-lg border-2 border-dashed border-slate/30 bg-cream/50 p-12 text-center">
               <ShoppingBag className="mx-auto h-12 w-12 text-slate/50" />

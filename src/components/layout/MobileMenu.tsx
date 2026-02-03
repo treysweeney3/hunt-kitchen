@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { X, ChevronRight, User, ShoppingBag } from 'lucide-react';
 import {
   Sheet,
@@ -67,14 +68,6 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                   </div>
                 </div>
                 <div className="mt-3 space-y-2">
-                  <Link
-                    href="/account/orders"
-                    onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:bg-stone/30"
-                  >
-                    <span>My Orders</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
                   <Link
                     href="/account/settings"
                     onClick={handleLinkClick}
@@ -161,18 +154,16 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                 </Button>
               </Link>
               {user && (
-                <Link
-                  href="/api/auth/signout"
-                  onClick={handleLinkClick}
-                  className="block"
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-errorRed hover:bg-errorRed/10 hover:text-errorRed"
+                  onClick={() => {
+                    onClose();
+                    signOut({ callbackUrl: '/' });
+                  }}
                 >
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-errorRed hover:bg-errorRed/10 hover:text-errorRed"
-                  >
-                    Sign Out
-                  </Button>
-                </Link>
+                  Sign Out
+                </Button>
               )}
             </div>
           </div>

@@ -5,9 +5,9 @@ import Image from 'next/image';
 
 const gameTypeImages = [
   { src: '/images/game-types/venison.jpg', alt: 'Venison' },
-  { src: '/images/game-types/elk.jpg', alt: 'Elk' },
   { src: '/images/game-types/wild-boar.jpg', alt: 'Wild Boar' },
   { src: '/images/game-types/duck.jpg', alt: 'Duck' },
+  { src: '/images/game-types/elk.jpg', alt: 'Elk' },
   { src: '/images/game-types/turkey.jpg', alt: 'Wild Turkey' },
   { src: '/images/game-types/rabbit.jpg', alt: 'Rabbit' },
 ];

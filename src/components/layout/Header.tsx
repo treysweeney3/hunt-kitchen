@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import {
   Search,
   User,
@@ -156,14 +157,6 @@ export function Header({ user }: HeaderProps) {
                     )}
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/account/orders"
-                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
-                      >
-                        Orders
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
                         href="/account/settings"
                         className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
@@ -179,13 +172,11 @@ export function Header({ user }: HeaderProps) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/api/auth/signout"
-                        className="cursor-pointer text-errorRed hover:text-errorRed/80"
-                      >
-                        Sign Out
-                      </Link>
+                    <DropdownMenuItem
+                      onClick={() => signOut({ callbackUrl: '/' })}
+                      className="cursor-pointer text-errorRed hover:text-errorRed/80"
+                    >
+                      Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

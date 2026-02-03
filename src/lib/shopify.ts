@@ -42,9 +42,6 @@ async function shopifyFetch<T>(query: string, variables?: Record<string, unknown
     throw new Error("Shopify is not configured");
   }
 
-  console.log("[Shopify] Fetching from:", SHOPIFY_STOREFRONT_URL);
-  console.log("[Shopify] Variables:", JSON.stringify(variables));
-
   const response = await fetch(SHOPIFY_STOREFRONT_URL, {
     method: "POST",
     headers: {
@@ -62,7 +59,6 @@ async function shopifyFetch<T>(query: string, variables?: Record<string, unknown
   }
 
   const json = await response.json();
-  console.log("[Shopify] Raw response:", JSON.stringify(json, null, 2));
 
   if (json.errors) {
     console.error("[Shopify] GraphQL Errors:", json.errors);
@@ -353,6 +349,18 @@ export async function getProductByHandle(
   }
 
   return normalizeProduct(data.product);
+}
+
+/**
+ * Fetch multiple products by their handles
+ */
+export async function getProductsByHandles(
+  handles: string[]
+): Promise<NormalizedShopifyProduct[]> {
+  const products = await Promise.all(
+    handles.map((handle) => getProductByHandle(handle))
+  );
+  return products.filter((p): p is NormalizedShopifyProduct => p !== null);
 }
 
 /**

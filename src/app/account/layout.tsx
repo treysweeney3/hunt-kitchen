@@ -4,9 +4,7 @@ import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import {
   User,
-  Package,
   Heart,
-  MapPin,
   Settings,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
@@ -37,19 +35,9 @@ export default async function AccountLayout({
       icon: User,
     },
     {
-      name: "Orders",
-      href: "/account/orders",
-      icon: Package,
-    },
-    {
       name: "Saved Recipes",
       href: "/account/saved-recipes",
       icon: Heart,
-    },
-    {
-      name: "Addresses",
-      href: "/account/addresses",
-      icon: MapPin,
     },
     {
       name: "Settings",
