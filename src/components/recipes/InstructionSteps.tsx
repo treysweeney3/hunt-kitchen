@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { RecipeInstruction } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Separator } from "@/components/ui/separator";
@@ -64,19 +63,21 @@ export function InstructionSteps({
   const completedCount = completedSteps.size;
   const totalCount = instructions.length;
   const progressPercentage = (completedCount / totalCount) * 100;
-  const allCompleted = completedCount === totalCount;
 
-  // Sort instructions by step number
-  const sortedInstructions = [...instructions].sort(
-    (a, b) => a.stepNumber - b.stepNumber
-  );
+  // Normalize and sort instructions - handle both {step, imageUrl} and {stepNumber, text, imageUrl} formats
+  const sortedInstructions = [...instructions]
+    .map((instruction, index) => ({
+      stepNumber: instruction.stepNumber ?? index + 1,
+      text: instruction.text ?? (instruction as unknown as { step: string }).step ?? '',
+      imageUrl: instruction.imageUrl,
+    }))
+    .sort((a, b) => a.stepNumber - b.stepNumber);
 
   return (
     <div className={cn("space-y-6", className)}>
       {/* Header with Progress */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">Instructions</h3>
           <span className="text-sm text-muted-foreground">
             {completedCount} of {totalCount} complete
           </span>
@@ -93,8 +94,9 @@ export function InstructionSteps({
           return (
             <div
               key={`instruction-${index}`}
+              onClick={() => handleToggleStep(instruction.stepNumber)}
               className={cn(
-                "relative flex gap-4 p-4 rounded-lg transition-all",
+                "relative flex gap-4 p-4 rounded-lg transition-all cursor-pointer",
                 isCompleted
                   ? "bg-muted/50 opacity-70"
                   : "bg-background hover:bg-muted/30"
@@ -102,13 +104,12 @@ export function InstructionSteps({
             >
               {/* Step Number Badge */}
               <div className="flex-shrink-0">
-                <button
-                  onClick={() => handleToggleStep(instruction.stepNumber)}
+                <div
                   className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-full font-semibold text-lg transition-all",
                     isCompleted
                       ? "bg-[#2D5A3D] text-white"
-                      : "bg-[#F5F2EB] text-[#4A3728] hover:bg-[#E07C24] hover:text-white"
+                      : "bg-[#F5F2EB] text-[#4A3728]"
                   )}
                 >
                   {isCompleted ? (
@@ -116,25 +117,25 @@ export function InstructionSteps({
                   ) : (
                     <span>{instruction.stepNumber}</span>
                   )}
-                </button>
+                </div>
               </div>
 
               {/* Step Content */}
               <div className="flex-1 space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <Label
+                    <span
                       className={cn(
-                        "text-base leading-relaxed cursor-pointer font-normal",
-                        isCompleted && "line-through"
+                        "text-base leading-relaxed font-normal",
+                        isCompleted && "line-through text-muted-foreground"
                       )}
-                      onClick={() => handleToggleStep(instruction.stepNumber)}
                     >
                       {instruction.text}
-                    </Label>
+                    </span>
                   </div>
                   <Checkbox
                     checked={isCompleted}
+                    onClick={(e) => e.stopPropagation()}
                     onCheckedChange={() =>
                       handleToggleStep(instruction.stepNumber)
                     }
@@ -161,58 +162,6 @@ export function InstructionSteps({
           );
         })}
       </div>
-
-      {/* Completion Message */}
-      {allCompleted && completedCount > 0 && (
-        <div className="bg-[#2D5A3D] text-white rounded-lg p-6 text-center space-y-2">
-          <CheckCircle2 className="h-12 w-12 mx-auto mb-2" />
-          <h4 className="font-semibold text-xl">Recipe Complete!</h4>
-          <p className="text-white/90">
-            Great job! Your dish should be ready to enjoy.
-          </p>
-        </div>
-      )}
-
-      {/* Visual Progress Timeline */}
-      {totalCount > 1 && (
-        <div className="relative pt-4">
-          <div className="flex justify-between items-center">
-            {sortedInstructions.map((instruction, index) => {
-              const isCompleted = completedSteps.has(instruction.stepNumber);
-              const isLast = index === sortedInstructions.length - 1;
-
-              return (
-                <div key={`timeline-${index}`} className="flex items-center">
-                  <button
-                    onClick={() => handleToggleStep(instruction.stepNumber)}
-                    className="relative z-10"
-                  >
-                    {isCompleted ? (
-                      <CheckCircle2 className="h-6 w-6 text-[#2D5A3D] fill-[#2D5A3D]" />
-                    ) : (
-                      <Circle className="h-6 w-6 text-gray-300" />
-                    )}
-                  </button>
-                  {!isLast && (
-                    <div
-                      className={cn(
-                        "flex-1 h-0.5 mx-1",
-                        isCompleted &&
-                          completedSteps.has(instruction.stepNumber + 1)
-                          ? "bg-[#2D5A3D]"
-                          : "bg-gray-300"
-                      )}
-                      style={{
-                        width: `${100 / (totalCount - 1)}px`,
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 
-// Type for request body
 interface RateRecipeBody {
   rating: number;
   reviewText?: string;
-  userId?: string; // Optional - allows anonymous ratings
 }
 
 export async function POST(
@@ -13,10 +13,19 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "You must be logged in to rate recipes" },
+        { status: 401 }
+      );
+    }
+
+    const userId = session.user.id;
     const { slug } = await params;
     const body: RateRecipeBody = await request.json();
 
-    // Validate rating
     if (!body.rating || body.rating < 1 || body.rating > 5) {
       return NextResponse.json(
         { error: "Rating must be between 1 and 5" },
@@ -24,7 +33,6 @@ export async function POST(
       );
     }
 
-    // Check if recipe exists
     const recipe = await prisma.recipe.findUnique({
       where: { slug },
     });
@@ -36,51 +44,51 @@ export async function POST(
       );
     }
 
-    // Check if user already rated this recipe
-    if (body.userId) {
-      const existingRating = await prisma.recipeRating.findFirst({
-        where: {
-          recipeId: recipe.id,
-          userId: body.userId,
-        },
-      });
+    const existingRating = await prisma.recipeRating.findFirst({
+      where: {
+        recipeId: recipe.id,
+        userId,
+      },
+    });
 
-      if (existingRating) {
-        return NextResponse.json(
-          { error: "You have already rated this recipe" },
-          { status: 400 }
-        );
-      }
+    if (existingRating) {
+      return NextResponse.json(
+        { error: "You have already rated this recipe" },
+        { status: 400 }
+      );
     }
 
-    // Create rating
     const rating = await prisma.recipeRating.create({
       data: {
         recipeId: recipe.id,
-        userId: body.userId || null,
+        userId,
         rating: body.rating,
         reviewText: body.reviewText || null,
-        isApproved: false, // Requires admin approval
+        isApproved: true,
       },
       include: {
-        user: body.userId
-          ? {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            }
-          : false,
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
 
     return NextResponse.json({
-      message: "Rating submitted successfully. It will appear after approval.",
+      message: "Review submitted successfully!",
       rating: {
         id: rating.id,
+        recipeId: rating.recipeId,
+        userId: rating.userId,
         rating: rating.rating,
         reviewText: rating.reviewText,
+        isApproved: rating.isApproved,
         createdAt: rating.createdAt,
+        updatedAt: rating.updatedAt,
+        user: rating.user,
       },
     }, { status: 201 });
   } catch (error) {

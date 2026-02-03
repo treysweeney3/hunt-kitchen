@@ -1,20 +1,23 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
-import { RecipeHero } from '@/components/recipes/RecipeHero';
+import { authOptions } from '@/lib/auth';
+import { RecipeHeroWithSave } from '@/components/recipes/RecipeHeroWithSave';
 import { IngredientList } from '@/components/recipes/IngredientList';
 import { InstructionSteps } from '@/components/recipes/InstructionSteps';
-import { RecipeRating } from '@/components/recipes/RecipeRating';
-import { RecipeGrid } from '@/components/recipes/RecipeGrid';
-import { ProductGrid } from '@/components/shop/ProductGrid';
+import { RecipeRatingSection } from '@/components/recipes/RecipeRatingSection';
+import { QuickRating } from '@/components/recipes/QuickRating';
+import { RecipeGridWithSave } from '@/components/recipes/RecipeGridWithSave';
+import { ShopifyProductCard } from '@/components/shop/ShopifyProductCard';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Separator } from '@/components/ui/separator';
 import { ChevronDown, Lightbulb, Play } from 'lucide-react';
 import { generateMetadata as generateSEOMetadata, generateRecipeStructuredData } from '@/lib/seo';
 import { siteConfig } from '@/config/site';
-import type { Recipe, Product } from '@/types';
+import { getProductsByHandles, isShopifyConfigured } from '@/lib/shopify';
+import type { Recipe, RecipeRating as RecipeRatingType } from '@/types';
 
 interface RecipePageProps {
   params: Promise<{
@@ -22,7 +25,11 @@ interface RecipePageProps {
   }>;
 }
 
-async function getRecipe(slug: string): Promise<Recipe | null> {
+interface RecipeWithRatings extends Recipe {
+  ratings: RecipeRatingType[];
+}
+
+async function getRecipe(slug: string): Promise<RecipeWithRatings | null> {
   const recipe = await prisma.recipe.findUnique({
     where: { slug, isPublished: true },
     include: {
@@ -33,19 +40,47 @@ async function getRecipe(slug: string): Promise<Recipe | null> {
         },
       },
       ratings: {
-        where: { isApproved: true },
-        select: { rating: true },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
       },
     },
   });
 
   if (!recipe) return null;
 
-  // Calculate average rating
-  const ratingCount = recipe.ratings.length;
+  // Calculate average from ALL ratings (not just approved)
+  const allRatings = recipe.ratings;
+  const ratingCount = allRatings.length;
   const averageRating = ratingCount > 0
-    ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount
+    ? Math.round((allRatings.reduce((sum, r) => sum + r.rating, 0) / ratingCount) * 10) / 10
     : 0;
+
+  // Filter to only approved ratings for display
+  const approvedRatings = allRatings.filter((r) => r.isApproved);
+
+  const ratings: RecipeRatingType[] = approvedRatings.map((r) => ({
+    id: r.id,
+    recipeId: r.recipeId,
+    userId: r.userId,
+    rating: r.rating,
+    reviewText: r.reviewText,
+    isApproved: r.isApproved,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+    user: r.user ? {
+      id: r.user.id,
+      firstName: r.user.firstName,
+      lastName: r.user.lastName,
+    } : undefined,
+  }));
 
   return {
     id: recipe.id,
@@ -77,6 +112,7 @@ async function getRecipe(slug: string): Promise<Recipe | null> {
     })),
     averageRating,
     ratingCount,
+    ratings,
     metaTitle: recipe.metaTitle,
     metaDescription: recipe.metaDescription,
     isFeatured: recipe.isFeatured,
@@ -84,7 +120,45 @@ async function getRecipe(slug: string): Promise<Recipe | null> {
     publishedAt: recipe.publishedAt,
     createdAt: recipe.createdAt,
     updatedAt: recipe.updatedAt,
-  } as Recipe;
+  } as RecipeWithRatings;
+}
+
+async function getUserRating(recipeId: string, userId: string | undefined): Promise<RecipeRatingType | null> {
+  if (!userId) return null;
+
+  const rating = await prisma.recipeRating.findFirst({
+    where: {
+      recipeId,
+      userId,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+
+  if (!rating) return null;
+
+  return {
+    id: rating.id,
+    recipeId: rating.recipeId,
+    userId: rating.userId,
+    rating: rating.rating,
+    reviewText: rating.reviewText,
+    isApproved: rating.isApproved,
+    createdAt: rating.createdAt,
+    updatedAt: rating.updatedAt,
+    user: rating.user ? {
+      id: rating.user.id,
+      firstName: rating.user.firstName,
+      lastName: rating.user.lastName,
+    } : undefined,
+  };
 }
 
 async function getRelatedRecipes(recipeId: string, gameTypeId?: string): Promise<Recipe[]> {
@@ -97,7 +171,6 @@ async function getRelatedRecipes(recipeId: string, gameTypeId?: string): Promise
     include: {
       gameType: true,
       ratings: {
-        where: { isApproved: true },
         select: { rating: true },
       },
     },
@@ -106,9 +179,10 @@ async function getRelatedRecipes(recipeId: string, gameTypeId?: string): Promise
   });
 
   return recipes.map((recipe) => {
+    // Calculate average from ALL ratings, rounded to 1 decimal
     const ratingCount = recipe.ratings.length;
     const averageRating = ratingCount > 0
-      ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount
+      ? Math.round((recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount) * 10) / 10
       : 0;
 
     return {
@@ -134,23 +208,13 @@ async function getRelatedRecipes(recipeId: string, gameTypeId?: string): Promise
   }) as Recipe[];
 }
 
-async function getRelatedProducts(): Promise<Product[]> {
-  const products = await prisma.product.findMany({
-    where: { isActive: true, isFeatured: true },
-    take: 3,
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    slug: product.slug,
-    description: product.description,
-    featuredImageUrl: product.featuredImageUrl,
-    basePrice: Number(product.basePrice),
-    compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
-  })) as Product[];
-}
+// Featured product handles - same as landing page
+const FEATURED_PRODUCT_HANDLES = [
+  "cookbook-venison-edition",
+  "tshirt",
+  "full-logo-t-shirt",
+  "logo-hoodie",
+];
 
 export async function generateMetadata({ params }: RecipePageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -182,14 +246,20 @@ export async function generateMetadata({ params }: RecipePageProps): Promise<Met
 
 export default async function RecipePage({ params }: RecipePageProps) {
   const { slug } = await params;
-  const recipe = await getRecipe(slug);
+  const [recipe, session] = await Promise.all([
+    getRecipe(slug),
+    getServerSession(authOptions),
+  ]);
 
   if (!recipe) {
     notFound();
   }
 
-  const relatedRecipes = await getRelatedRecipes(recipe.id, recipe.gameType?.id);
-  const relatedProducts = await getRelatedProducts();
+  const [relatedRecipes, featuredProducts, userRating] = await Promise.all([
+    getRelatedRecipes(recipe.id, recipe.gameType?.id),
+    isShopifyConfigured() ? getProductsByHandles(FEATURED_PRODUCT_HANDLES) : Promise.resolve([]),
+    getUserRating(recipe.id, session?.user?.id),
+  ]);
 
   // Generate Recipe structured data
   const recipeUrl = `${siteConfig.url}/recipes/${slug}`;
@@ -201,7 +271,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
       <JsonLd data={recipeStructuredData as unknown as Record<string, unknown>} />
 
       {/* Recipe Hero */}
-      <RecipeHero recipe={recipe} />
+      <RecipeHeroWithSave recipe={recipe} />
 
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Main Content */}
@@ -246,23 +316,6 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 <InstructionSteps instructions={recipe.instructions} />
               </CardContent>
             </Card>
-
-            {/* Chef's Tips */}
-            {recipe.tips && (
-              <Card className="border-[#E07C24] bg-[#E07C24]/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-serif text-2xl text-[#4A3728]">
-                    <Lightbulb className="h-6 w-6 text-[#E07C24]" />
-                    Chef's Tips
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="whitespace-pre-wrap text-[#333333] leading-relaxed">
-                    {recipe.tips}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Nutrition Information */}
             {recipe.nutritionInfo && (
@@ -339,18 +392,21 @@ export default async function RecipePage({ params }: RecipePageProps) {
               </Collapsible>
             )}
 
-            {/* Rating and Reviews */}
+            {/* Reviews */}
             <Card>
               <CardHeader>
                 <CardTitle className="font-serif text-2xl text-[#4A3728]">
-                  Ratings & Reviews
+                  Reviews
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <RecipeRating
+                <RecipeRatingSection
                   recipeId={recipe.id}
+                  recipeSlug={recipe.slug}
                   averageRating={recipe.averageRating || 0}
                   ratingCount={recipe.ratingCount || 0}
+                  ratings={recipe.ratings}
+                  userRating={userRating}
                 />
               </CardContent>
             </Card>
@@ -358,22 +414,52 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            {/* Related Products */}
-            {relatedProducts.length > 0 && (
-              <Card>
+            {/* Rating Summary - Quick Rating */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-serif text-xl text-[#4A3728]">
+                  Rate this Recipe
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <QuickRating
+                  recipeSlug={recipe.slug}
+                  averageRating={recipe.averageRating || 0}
+                  ratingCount={recipe.ratingCount || 0}
+                  userRating={userRating?.rating ?? null}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Chef's Tips */}
+            {recipe.tips && (
+              <Card className="border-[#E07C24] bg-[#E07C24]/5">
                 <CardHeader>
-                  <CardTitle className="font-serif text-xl text-[#4A3728]">
-                    You Might Also Like
+                  <CardTitle className="flex items-center gap-2 font-serif text-xl text-[#4A3728]">
+                    <Lightbulb className="h-5 w-5 text-[#E07C24]" />
+                    Chef's Tips
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {relatedProducts.slice(0, 3).map((product) => (
-                      <div key={product.id}>
-                        {/* Product preview - simplified version */}
-                        <p className="text-sm">{product.name}</p>
-                        <Separator className="mt-4" />
-                      </div>
+                  <p className="whitespace-pre-wrap text-[#333333] leading-relaxed text-sm">
+                    {recipe.tips}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Featured Products */}
+            {featuredProducts.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-serif text-xl text-[#4A3728]">
+                    Shop The Hunt Kitchen
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3">
+                    {featuredProducts.slice(0, 4).map((product) => (
+                      <ShopifyProductCard key={product.id} product={product} />
                     ))}
                   </div>
                 </CardContent>
@@ -393,7 +479,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 More {recipe.gameType?.name} recipes you might enjoy
               </p>
             </div>
-            <RecipeGrid recipes={relatedRecipes.slice(0, 4)} />
+            <RecipeGridWithSave recipes={relatedRecipes.slice(0, 4)} />
           </section>
         )}
       </div>

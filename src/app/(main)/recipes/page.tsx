@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { RecipeGrid } from '@/components/recipes/RecipeGrid';
+import { RecipeGridWithSave } from '@/components/recipes/RecipeGridWithSave';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import type { Recipe, PaginatedResponse, RecipeFilters } from '@/types';
@@ -53,15 +53,16 @@ async function getRecipes(sortBy: string = 'popular'): Promise<PaginatedResponse
       include: {
         gameType: true,
         categories: { include: { category: true } },
-        ratings: { where: { isApproved: true } },
+        ratings: true,
       },
     }),
     prisma.recipe.count({ where }),
   ]);
 
   const formattedRecipes: Recipe[] = recipes.map((r) => {
+    // Calculate average from ALL ratings, rounded to 1 decimal
     const avgRating = r.ratings.length > 0
-      ? r.ratings.reduce((sum, rating) => sum + rating.rating, 0) / r.ratings.length
+      ? Math.round((r.ratings.reduce((sum, rating) => sum + rating.rating, 0) / r.ratings.length) * 10) / 10
       : 0;
 
     return {
@@ -106,7 +107,7 @@ async function getRecipes(sortBy: string = 'popular'): Promise<PaginatedResponse
       isPublished: r.isPublished,
       publishedAt: r.publishedAt,
       viewCount: r.viewCount,
-      averageRating: Math.round(avgRating * 10) / 10,
+      averageRating: avgRating,
       ratingCount: r.ratings.length,
       metaTitle: r.metaTitle,
       metaDescription: r.metaDescription,
@@ -173,7 +174,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
           {/* Recipes Grid - Full Width */}
           <div className="space-y-6">
             {recipes.length > 0 ? (
-              <RecipeGrid recipes={recipes} />
+              <RecipeGridWithSave recipes={recipes} />
             ) : (
               <div className="rounded-lg border-2 border-dashed border-slate/30 bg-white p-12 text-center">
                 <h3 className="font-semibold text-lg text-forestGreen">

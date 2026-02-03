@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 interface RecipeGridProps {
   recipes: Recipe[];
-  onSaveRecipe?: (recipeId: string) => Promise<void>;
+  onSaveRecipe?: (recipeSlug: string, recipeId: string) => Promise<void>;
   savedRecipeIds?: string[];
   isLoading?: boolean;
   emptyMessage?: string;

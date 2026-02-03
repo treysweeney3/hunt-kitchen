@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { RecipeGrid } from '@/components/recipes/RecipeGrid';
+import { RecipeGridWithSave } from '@/components/recipes/RecipeGridWithSave';
 import { RecipeFiltersClient } from '@/components/recipes/RecipeFiltersClient';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -153,7 +153,7 @@ export default async function GameTypeRecipesPage({ params, searchParams }: Game
                   {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                   {pagination.total} recipes
                 </div>
-                <RecipeGrid recipes={recipes} />
+                <RecipeGridWithSave recipes={recipes} />
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (

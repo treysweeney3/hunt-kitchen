@@ -15,8 +15,7 @@ export async function GET(request: NextRequest) {
 
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    // Search recipes
-    const recipesPromise = prisma.recipe.findMany({
+    const recipes = await prisma.recipe.findMany({
       where: {
         isPublished: true,
         OR: [
@@ -36,7 +35,6 @@ export async function GET(request: NextRequest) {
           },
         },
         ratings: {
-          where: { isApproved: true },
           select: {
             rating: true,
           },
@@ -44,45 +42,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Search products
-    const productsPromise = prisma.product.findMany({
-      where: {
-        isActive: true,
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { description: { contains: query, mode: "insensitive" } },
-          { shortDescription: { contains: query, mode: "insensitive" } },
-        ],
-      },
-      take: limit,
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        category: {
-          select: {
-            name: true,
-            slug: true,
-          },
-        },
-        variants: {
-          where: { isActive: true },
-          select: {
-            inventoryQty: true,
-          },
-        },
-      },
-    });
-
-    const [recipes, products] = await Promise.all([
-      recipesPromise,
-      productsPromise,
-    ]);
-
-    // Format recipes
+    // Calculate average from ALL ratings, rounded to 1 decimal
     const formattedRecipes = recipes.map((recipe) => {
       const avgRating = recipe.ratings.length > 0
-        ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / recipe.ratings.length
+        ? Math.round((recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / recipe.ratings.length) * 10) / 10
         : 0;
 
       return {
@@ -94,33 +57,8 @@ export async function GET(request: NextRequest) {
         imageUrl: recipe.featuredImageUrl,
         gameType: recipe.gameType,
         totalTimeMinutes: recipe.totalTimeMinutes,
-        averageRating: Math.round(avgRating * 10) / 10,
-        ratingsCount: recipe.ratings.length,
-      };
-    });
-
-    // Format products
-    const formattedProducts = products.map((product) => {
-      let inStock = true;
-      if (product.trackInventory && product.variants.length > 0) {
-        const totalInventory = product.variants.reduce(
-          (sum, v) => sum + v.inventoryQty,
-          0
-        );
-        inStock = totalInventory > 0;
-      }
-
-      return {
-        type: "product" as const,
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        description: product.shortDescription || product.description,
-        imageUrl: product.featuredImageUrl,
-        category: product.category,
-        price: product.basePrice,
-        compareAtPrice: product.compareAtPrice,
-        inStock,
+        averageRating: avgRating,
+        ratingCount: recipe.ratings.length,
       };
     });
 
@@ -128,12 +66,10 @@ export async function GET(request: NextRequest) {
       query,
       results: {
         recipes: formattedRecipes,
-        products: formattedProducts,
       },
       counts: {
         recipes: formattedRecipes.length,
-        products: formattedProducts.length,
-        total: formattedRecipes.length + formattedProducts.length,
+        total: formattedRecipes.length,
       },
     });
   } catch (error) {

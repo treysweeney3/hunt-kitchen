@@ -5,7 +5,6 @@ import prisma from '@/lib/prisma';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -40,7 +39,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Fetch all published recipes
     const recipes = await prisma.recipe.findMany({
       where: {
         isPublished: true,
@@ -61,7 +59,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    // Fetch all recipe categories
     const recipeCategories = await prisma.recipeCategory.findMany({
       where: {
         isActive: true,
@@ -79,7 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    // Fetch all game types
     const gameTypes = await prisma.gameType.findMany({
       where: {
         isActive: true,
@@ -97,56 +93,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    // Fetch all active products
-    const products = await prisma.product.findMany({
-      where: {
-        isActive: true,
-      },
-      select: {
-        slug: true,
-        updatedAt: true,
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
-
-    const productPages: MetadataRoute.Sitemap = products.map((product) => ({
-      url: `${baseUrl}/shop/product/${product.slug}`,
-      lastModified: product.updatedAt,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    }));
-
-    // Fetch all product categories
-    const productCategories = await prisma.productCategory.findMany({
-      where: {
-        isActive: true,
-      },
-      select: {
-        slug: true,
-        updatedAt: true,
-      },
-    });
-
-    const productCategoryPages: MetadataRoute.Sitemap = productCategories.map((category) => ({
-      url: `${baseUrl}/shop/category/${category.slug}`,
-      lastModified: category.updatedAt,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    }));
-
     return [
       ...staticPages,
       ...recipePages,
       ...recipeCategoryPages,
       ...gameTypePages,
-      ...productPages,
-      ...productCategoryPages,
     ];
   } catch (error) {
     console.error('Error generating sitemap:', error);
-    // Return static pages if database query fails
     return staticPages;
   }
 }

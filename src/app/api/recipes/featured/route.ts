@@ -32,7 +32,6 @@ export async function GET() {
           },
         },
         ratings: {
-          where: { isApproved: true },
           select: {
             rating: true,
           },
@@ -40,10 +39,10 @@ export async function GET() {
       },
     });
 
-    // Calculate average ratings
+    // Calculate average ratings from ALL ratings, rounded to 1 decimal
     const recipesWithRatings = recipes.map((recipe) => {
       const avgRating = recipe.ratings.length > 0
-        ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / recipe.ratings.length
+        ? Math.round((recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / recipe.ratings.length) * 10) / 10
         : 0;
 
       return {
@@ -59,8 +58,8 @@ export async function GET() {
         totalTimeMinutes: recipe.totalTimeMinutes,
         servings: recipe.servings,
         viewCount: recipe.viewCount,
-        averageRating: Math.round(avgRating * 10) / 10,
-        ratingsCount: recipe.ratings.length,
+        averageRating: avgRating,
+        ratingCount: recipe.ratings.length,
         publishedAt: recipe.publishedAt,
       };
     });

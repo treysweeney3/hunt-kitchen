@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Clock, Copy, Star } from "lucide-react";
@@ -15,7 +15,7 @@ import { getImageUrl } from "@/lib/constants";
 
 interface RecipeCardProps {
   recipe: Recipe;
-  onSave?: (recipeId: string) => Promise<void>;
+  onSave?: (recipeSlug: string, recipeId: string) => Promise<void>;
   isSaved?: boolean;
   className?: string;
 }
@@ -30,6 +30,11 @@ export function RecipeCard({
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(isSaved);
 
+  // Sync saved state with prop when it changes
+  useEffect(() => {
+    setSaved(isSaved);
+  }, [isSaved]);
+
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -41,11 +46,11 @@ export function RecipeCard({
 
     setIsSaving(true);
     try {
-      await onSave(recipe.id);
+      await onSave(recipe.slug, recipe.id);
       setSaved(!saved);
       toast.success(saved ? "Recipe removed from favorites" : "Recipe saved to favorites");
     } catch (error) {
-      toast.error("Failed to save recipe");
+      toast.error(error instanceof Error ? error.message : "Failed to save recipe");
     } finally {
       setIsSaving(false);
     }
@@ -68,7 +73,7 @@ export function RecipeCard({
     <Link href={`/recipes/${recipe.slug}`}>
       <Card
         className={cn(
-          "group overflow-hidden transition-all hover:shadow-lg",
+          "group overflow-hidden transition-all hover:shadow-lg py-0",
           className
         )}
         onMouseEnter={() => setIsHovered(true)}

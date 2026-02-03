@@ -31,7 +31,6 @@ export async function GET(
           },
         },
         ratings: {
-          where: { isApproved: true },
           include: {
             user: {
               select: {
@@ -60,13 +59,14 @@ export async function GET(
       data: { viewCount: { increment: 1 } },
     });
 
-    // Calculate average rating
+    // Calculate average rating from ALL ratings, rounded to 1 decimal
     const avgRating = recipe.ratings.length > 0
-      ? recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / recipe.ratings.length
+      ? Math.round((recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / recipe.ratings.length) * 10) / 10
       : 0;
 
-    // Format reviews
-    const reviews = recipe.ratings.map((rating) => ({
+    // Format reviews (only approved ones for display)
+    const approvedRatings = recipe.ratings.filter((r) => r.isApproved);
+    const reviews = approvedRatings.map((rating) => ({
       id: rating.id,
       rating: rating.rating,
       reviewText: rating.reviewText,
@@ -97,8 +97,8 @@ export async function GET(
       nutritionInfo: recipe.nutritionInfo,
       videoUrl: recipe.videoUrl,
       viewCount: recipe.viewCount + 1, // Include the incremented count
-      averageRating: Math.round(avgRating * 10) / 10,
-      ratingsCount: recipe.ratings.length,
+      averageRating: avgRating,
+      ratingCount: recipe.ratings.length,
       reviews,
       publishedAt: recipe.publishedAt,
       metaTitle: recipe.metaTitle,

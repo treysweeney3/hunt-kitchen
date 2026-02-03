@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Clock, Users, Star, Heart, Printer, Share2, Copy, Facebook, Twitter } from "lucide-react";
 import { Recipe } from "@/types";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 interface RecipeHeroProps {
   recipe: Recipe;
-  onSave?: (recipeId: string) => Promise<void>;
+  onSave?: (recipeSlug: string, recipeId: string) => Promise<void>;
   isSaved?: boolean;
   className?: string;
 }
@@ -31,6 +31,11 @@ export function RecipeHero({
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(isSaved);
 
+  // Sync saved state with prop when it changes
+  useEffect(() => {
+    setSaved(isSaved);
+  }, [isSaved]);
+
   const handleSave = async () => {
     if (!onSave) {
       toast.error("Please log in to save recipes");
@@ -39,11 +44,11 @@ export function RecipeHero({
 
     setIsSaving(true);
     try {
-      await onSave(recipe.id);
+      await onSave(recipe.slug, recipe.id);
       setSaved(!saved);
       toast.success(saved ? "Recipe removed from favorites" : "Recipe saved to favorites");
     } catch (error) {
-      toast.error("Failed to save recipe");
+      toast.error(error instanceof Error ? error.message : "Failed to save recipe");
     } finally {
       setIsSaving(false);
     }

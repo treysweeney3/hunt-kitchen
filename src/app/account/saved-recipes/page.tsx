@@ -22,41 +22,41 @@ import { toast } from "sonner";
 export default function SavedRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [recipeToRemove, setRecipeToRemove] = useState<string | null>(null);
+  const [recipeToRemove, setRecipeToRemove] = useState<{ id: string; slug: string } | null>(null);
   const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
-    async function fetchSavedRecipes() {
-      setLoading(true);
-      try {
-        const res = await fetch("/api/account/saved-recipes");
-        if (!res.ok) throw new Error("Failed to fetch saved recipes");
-
-        const data = await res.json();
-        setRecipes(data.recipes || []);
-      } catch (error) {
-        console.error("Error fetching saved recipes:", error);
-        toast.error("Failed to load saved recipes");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchSavedRecipes();
   }, []);
+
+  async function fetchSavedRecipes() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/recipes/saved");
+      if (!res.ok) throw new Error("Failed to fetch saved recipes");
+
+      const data = await res.json();
+      setRecipes(data.recipes || []);
+    } catch (error) {
+      console.error("Error fetching saved recipes:", error);
+      toast.error("Failed to load saved recipes");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleRemoveRecipe = async () => {
     if (!recipeToRemove) return;
 
     setRemoving(true);
     try {
-      const res = await fetch(`/api/account/saved-recipes/${recipeToRemove}`, {
+      const res = await fetch(`/api/recipes/${recipeToRemove.slug}/save`, {
         method: "DELETE",
       });
 
       if (!res.ok) throw new Error("Failed to remove recipe");
 
-      setRecipes((prev) => prev.filter((r) => r.id !== recipeToRemove));
+      setRecipes((prev) => prev.filter((r) => r.id !== recipeToRemove.id));
       toast.success("Recipe removed from saved recipes");
     } catch (error) {
       console.error("Error removing recipe:", error);
@@ -67,9 +67,9 @@ export default function SavedRecipesPage() {
     }
   };
 
-  const handleToggleSave = async (recipeId: string) => {
+  const handleToggleSave = async (recipeSlug: string, recipeId: string) => {
     // This will remove the recipe from saved
-    setRecipeToRemove(recipeId);
+    setRecipeToRemove({ id: recipeId, slug: recipeSlug });
   };
 
   if (loading) {
@@ -111,7 +111,7 @@ export default function SavedRecipesPage() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        setRecipeToRemove(recipe.id);
+                        setRecipeToRemove({ id: recipe.id, slug: recipe.slug });
                       }}
                     >
                       <Trash2 className="h-4 w-4" />

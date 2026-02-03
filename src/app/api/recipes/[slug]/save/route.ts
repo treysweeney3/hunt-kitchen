@@ -1,29 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 
-// Type for request body
-interface SaveRecipeBody {
-  userId: string;
+// GET - Check if recipe is saved by current user
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ isSaved: false });
+    }
+
+    const { slug } = await params;
+
+    const recipe = await prisma.recipe.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!recipe) {
+      return NextResponse.json(
+        { error: "Recipe not found" },
+        { status: 404 }
+      );
+    }
+
+    const savedRecipe = await prisma.savedRecipe.findUnique({
+      where: {
+        userId_recipeId: {
+          userId: session.user.id,
+          recipeId: recipe.id,
+        },
+      },
+    });
+
+    return NextResponse.json({ isSaved: !!savedRecipe });
+  } catch (error) {
+    console.error("Error checking saved status:", error);
+    return NextResponse.json(
+      { error: "Failed to check saved status" },
+      { status: 500 }
+    );
+  }
 }
 
+// POST - Save recipe for current user
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = await params;
-    const body: SaveRecipeBody = await request.json();
+    const session = await getServerSession(authOptions);
 
-    if (!body.userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "You must be logged in to save recipes" },
+        { status: 401 }
       );
     }
 
-    // Check if recipe exists
+    const { slug } = await params;
+
     const recipe = await prisma.recipe.findUnique({
       where: { slug },
+      select: { id: true },
     });
 
     if (!recipe) {
@@ -37,7 +81,7 @@ export async function POST(
     const existingSave = await prisma.savedRecipe.findUnique({
       where: {
         userId_recipeId: {
-          userId: body.userId,
+          userId: session.user.id,
           recipeId: recipe.id,
         },
       },
@@ -50,10 +94,9 @@ export async function POST(
       );
     }
 
-    // Save recipe
     await prisma.savedRecipe.create({
       data: {
-        userId: body.userId,
+        userId: session.user.id,
         recipeId: recipe.id,
       },
     });
@@ -71,25 +114,26 @@ export async function POST(
   }
 }
 
+// DELETE - Unsave recipe for current user
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = await params;
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get("userId");
+    const session = await getServerSession(authOptions);
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "You must be logged in to unsave recipes" },
+        { status: 401 }
       );
     }
 
-    // Find recipe by slug
+    const { slug } = await params;
+
     const recipe = await prisma.recipe.findUnique({
       where: { slug },
+      select: { id: true },
     });
 
     if (!recipe) {
@@ -99,23 +143,20 @@ export async function DELETE(
       );
     }
 
-    // Delete saved recipe
     await prisma.savedRecipe.delete({
       where: {
         userId_recipeId: {
-          userId,
+          userId: session.user.id,
           recipeId: recipe.id,
         },
       },
     });
 
-    return NextResponse.json({
-      message: "Recipe unsaved successfully",
-    });
+    return NextResponse.json({ message: "Recipe unsaved successfully" });
   } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json(
-        { error: "Saved recipe not found" },
+        { error: "Recipe was not saved" },
         { status: 404 }
       );
     }

@@ -117,20 +117,33 @@ export function RecipeRating({
       <Separator />
 
       {/* Reviews List */}
-      {ratings.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Reviews</h3>
-          {ratings
-            .filter((rating) => rating.isApproved && rating.id !== userRating?.id)
-            .map((rating) => (
-              <ReviewItem key={rating.id} rating={rating} />
-            ))}
-        </div>
-      ) : (
-        <p className="text-center text-muted-foreground py-8">
-          No reviews yet. Be the first to review this recipe!
-        </p>
-      )}
+      {(() => {
+        const displayableReviews = ratings.filter(
+          (rating) => rating.isApproved && rating.id !== userRating?.id
+        );
+
+        if (displayableReviews.length > 0) {
+          return (
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Reviews</h3>
+              {displayableReviews.map((rating) => (
+                <ReviewItem key={rating.id} rating={rating} />
+              ))}
+            </div>
+          );
+        }
+
+        // Only show "No reviews yet" if there are truly no ratings at all
+        if (ratingCount === 0 && !userRating) {
+          return (
+            <p className="text-center text-muted-foreground py-8">
+              No reviews yet. Be the first to review this recipe!
+            </p>
+          );
+        }
+
+        return null;
+      })()}
     </div>
   );
 }

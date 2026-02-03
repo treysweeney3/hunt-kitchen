@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ChefHat, ShoppingBag, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { RecipeGrid } from '@/components/recipes/RecipeGrid';
+import { RecipeGridWithSave } from '@/components/recipes/RecipeGridWithSave';
 import { ShopifyProductGrid } from '@/components/shop/ShopifyProductGrid';
 import { NewsletterForm } from '@/components/shared/NewsletterForm';
 import { GameTypeCarousel } from '@/components/shared/GameTypeCarousel';
@@ -33,29 +33,44 @@ const tiktokVideos = [
 async function getFeaturedRecipes(): Promise<Recipe[]> {
   const recipes = await prisma.recipe.findMany({
     where: { isPublished: true, isFeatured: true },
-    include: { gameType: true },
+    include: {
+      gameType: true,
+      ratings: {
+        select: { rating: true },
+      },
+    },
     take: 4,
     orderBy: { publishedAt: 'desc' },
   });
 
-  return recipes.map((recipe) => ({
-    id: recipe.id,
-    title: recipe.title,
-    slug: recipe.slug,
-    description: recipe.description,
-    featuredImageUrl: recipe.featuredImageUrl,
-    gameTypeId: recipe.gameTypeId,
-    prepTimeMinutes: recipe.prepTimeMinutes ?? 0,
-    cookTimeMinutes: recipe.cookTimeMinutes ?? 0,
-    totalTimeMinutes: recipe.totalTimeMinutes ?? 0,
-    servings: recipe.servings ?? 0,
-    viewCount: recipe.viewCount,
-    gameType: recipe.gameType ? {
-      id: recipe.gameType.id,
-      name: recipe.gameType.name,
-      slug: recipe.gameType.slug,
-    } : undefined,
-  })) as Recipe[];
+  return recipes.map((recipe) => {
+    // Calculate average from ALL ratings, rounded to 1 decimal
+    const ratingCount = recipe.ratings.length;
+    const averageRating = ratingCount > 0
+      ? Math.round((recipe.ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount) * 10) / 10
+      : 0;
+
+    return {
+      id: recipe.id,
+      title: recipe.title,
+      slug: recipe.slug,
+      description: recipe.description,
+      featuredImageUrl: recipe.featuredImageUrl,
+      gameTypeId: recipe.gameTypeId,
+      prepTimeMinutes: recipe.prepTimeMinutes ?? 0,
+      cookTimeMinutes: recipe.cookTimeMinutes ?? 0,
+      totalTimeMinutes: recipe.totalTimeMinutes ?? 0,
+      servings: recipe.servings ?? 0,
+      viewCount: recipe.viewCount,
+      gameType: recipe.gameType ? {
+        id: recipe.gameType.id,
+        name: recipe.gameType.name,
+        slug: recipe.gameType.slug,
+      } : undefined,
+      averageRating,
+      ratingCount,
+    };
+  }) as Recipe[];
 }
 
 // Featured product handles for the landing page
@@ -288,7 +303,7 @@ export default async function HomePage() {
             </Button>
           </div>
           {featuredRecipes.length > 0 ? (
-            <RecipeGrid recipes={featuredRecipes} />
+            <RecipeGridWithSave recipes={featuredRecipes} />
           ) : (
             <div className="rounded-lg border-2 border-dashed border-slate/30 bg-cream/50 p-12 text-center">
               <ChefHat className="mx-auto h-12 w-12 text-slate/50" />
