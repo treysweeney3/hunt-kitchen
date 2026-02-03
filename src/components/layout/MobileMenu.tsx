@@ -44,7 +44,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-forestGreen hover:text-hunterOrange"
+              className="text-forestGreen hover:text-hunterOrange hover:bg-transparent"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -71,7 +71,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                   <Link
                     href="/account/settings"
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:bg-stone/30"
+                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:text-hunterOrange hover:font-bold"
                   >
                     <span>Settings</span>
                     <ChevronRight className="h-4 w-4" />
@@ -79,7 +79,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                   <Link
                     href="/account/favorites"
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:bg-stone/30"
+                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:text-hunterOrange hover:font-bold"
                   >
                     <span>Favorites</span>
                     <ChevronRight className="h-4 w-4" />

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { ShopifyVariantSelector } from "./ShopifyVariantSelector";
 import { ShopifyAddToCart } from "./ShopifyAddToCart";
 import { Separator } from "@/components/ui/separator";
@@ -12,23 +11,16 @@ import type {
 interface ShopifyProductDetailsProps {
   product: NormalizedShopifyProduct;
   isSoldOut: boolean;
+  selectedVariant: NormalizedShopifyVariant | null;
+  onVariantChange: (variant: NormalizedShopifyVariant | null) => void;
 }
 
 export function ShopifyProductDetails({
   product,
   isSoldOut,
+  selectedVariant,
+  onVariantChange,
 }: ShopifyProductDetailsProps) {
-  const [selectedVariant, setSelectedVariant] =
-    useState<NormalizedShopifyVariant | null>(
-      product.variants.find((v) => v.availableForSale) || product.variants[0] || null
-    );
-
-  const handleVariantChange = useCallback(
-    (variant: NormalizedShopifyVariant | null) => {
-      setSelectedVariant(variant);
-    },
-    []
-  );
 
   const hasMultipleOptions =
     product.options.length > 0 &&
@@ -51,7 +43,7 @@ export function ShopifyProductDetails({
     <>
       {/* Dynamic Price Display */}
       <div className="flex items-baseline gap-3">
-        {currentCompareAtPrice && currentPrice < currentCompareAtPrice && (
+        {currentCompareAtPrice !== null && currentPrice < currentCompareAtPrice && (
           <span className="text-2xl text-slate line-through">
             {formatPrice(currentCompareAtPrice)}
           </span>
@@ -75,7 +67,7 @@ export function ShopifyProductDetails({
           <ShopifyVariantSelector
             variants={product.variants}
             options={product.options}
-            onVariantChange={handleVariantChange}
+            onVariantChange={onVariantChange}
           />
           <Separator />
         </>

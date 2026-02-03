@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ interface ProductGalleryProps {
   galleryImages?: string[];
   videoUrl?: string | null;
   productName: string;
+  selectedImageUrl?: string | null;
 }
 
 export function ProductGallery({
@@ -20,17 +21,49 @@ export function ProductGallery({
   galleryImages = [],
   videoUrl,
   productName,
+  selectedImageUrl,
 }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
 
-  // Combine all media: featured image, gallery images, and optional video
-  const allMedia = [
-    { type: "image" as const, url: featuredImage },
-    ...galleryImages.map((url) => ({ type: "image" as const, url })),
-    ...(videoUrl ? [{ type: "video" as const, url: videoUrl }] : []),
-  ];
+  // Combine all media: featured image, gallery images (deduplicated), and optional video
+  const allMedia = useMemo(() => {
+    const seenUrls = new Set<string>();
+    const media: Array<{ type: "image" | "video"; url: string }> = [];
+
+    // Add featured image first
+    if (featuredImage) {
+      seenUrls.add(featuredImage);
+      media.push({ type: "image", url: featuredImage });
+    }
+
+    // Add gallery images, skipping duplicates
+    for (const url of galleryImages) {
+      if (!seenUrls.has(url)) {
+        seenUrls.add(url);
+        media.push({ type: "image", url });
+      }
+    }
+
+    // Add video if present
+    if (videoUrl) {
+      media.push({ type: "video", url: videoUrl });
+    }
+
+    return media;
+  }, [featuredImage, galleryImages, videoUrl]);
+
+  // When selectedImageUrl changes, find and select that image
+  useEffect(() => {
+    if (selectedImageUrl) {
+      const index = allMedia.findIndex(
+        (media) => media.type === "image" && media.url === selectedImageUrl
+      );
+      if (index !== -1) {
+        setSelectedIndex(index);
+      }
+    }
+  }, [selectedImageUrl, allMedia]);
 
   const selectedMedia = allMedia[selectedIndex];
 

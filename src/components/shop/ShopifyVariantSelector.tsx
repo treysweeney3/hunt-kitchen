@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type {
@@ -50,6 +51,20 @@ export function ShopifyVariantSelector({
     );
   };
 
+  // Find a variant that has a specific option value (for getting color swatch images)
+  const findVariantWithOption = (
+    optionName: string,
+    optionValue: string
+  ): NormalizedShopifyVariant | null => {
+    return (
+      variants.find((variant) =>
+        variant.selectedOptions.some(
+          (opt) => opt.name === optionName && opt.value === optionValue
+        )
+      ) || null
+    );
+  };
+
   // Check if a specific option value is available given current selections
   const isOptionAvailable = (optionName: string, value: string): boolean => {
     const testSelections = { ...selectedOptions, [optionName]: value };
@@ -84,6 +99,16 @@ export function ShopifyVariantSelector({
       {options.map((option) => {
         const isColorOption = option.name.toLowerCase() === "color";
 
+        // For color options, check if variants have images we can use as swatches
+        const colorSwatchImages: Record<string, string | null> = {};
+        if (isColorOption) {
+          for (const value of option.values) {
+            const variant = findVariantWithOption(option.name, value);
+            colorSwatchImages[value] = variant?.image?.url || null;
+          }
+        }
+        const hasSwatchImages = Object.values(colorSwatchImages).some(Boolean);
+
         return (
           <div key={option.id}>
             <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -95,12 +120,13 @@ export function ShopifyVariantSelector({
               )}
             </label>
 
-            {isColorOption ? (
-              // Color swatches
+            {isColorOption && hasSwatchImages ? (
+              // Color swatches using variant images
               <div className="flex flex-wrap gap-2">
                 {option.values.map((value) => {
                   const isSelected = selectedOptions[option.name] === value;
                   const isAvailable = isOptionAvailable(option.name, value);
+                  const swatchImage = colorSwatchImages[value];
 
                   return (
                     <button
@@ -110,7 +136,7 @@ export function ShopifyVariantSelector({
                       }
                       disabled={!isAvailable}
                       className={cn(
-                        "group relative h-10 w-10 rounded-full border-2 transition-all",
+                        "group relative h-12 w-12 overflow-hidden rounded-md border-2 transition-all",
                         isSelected
                           ? "border-[#2D5A3D] ring-2 ring-[#2D5A3D] ring-offset-2"
                           : "border-gray-300 hover:border-gray-400",
@@ -118,14 +144,21 @@ export function ShopifyVariantSelector({
                       )}
                       title={value}
                     >
-                      <span
-                        className="block h-full w-full rounded-full"
-                        style={{
-                          backgroundColor: getColorHex(value),
-                        }}
-                      />
+                      {swatchImage ? (
+                        <Image
+                          src={swatchImage}
+                          alt={value}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center bg-gray-100 text-xs">
+                          {value.slice(0, 2)}
+                        </span>
+                      )}
                       {!isAvailable && (
-                        <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="absolute inset-0 flex items-center justify-center bg-white/50">
                           <span className="h-0.5 w-full rotate-45 bg-gray-400" />
                         </span>
                       )}
@@ -134,7 +167,7 @@ export function ShopifyVariantSelector({
                 })}
               </div>
             ) : (
-              // Button group for other options
+              // Button group for size and other options (or colors without images)
               <div className="flex flex-wrap gap-2">
                 {option.values.map((value) => {
                   const isSelected = selectedOptions[option.name] === value;
@@ -150,6 +183,7 @@ export function ShopifyVariantSelector({
                       variant={isSelected ? "default" : "outline"}
                       className={cn(
                         isSelected && "bg-[#2D5A3D] hover:bg-[#234a30]",
+                        !isSelected && "hover:text-hunterOrange hover:font-bold hover:bg-transparent hover:border-hunterOrange",
                         !isAvailable &&
                           "cursor-not-allowed opacity-50 line-through"
                       )}
@@ -164,49 +198,5 @@ export function ShopifyVariantSelector({
         );
       })}
     </div>
-  );
-}
-
-// Helper function to convert color names to hex
-function getColorHex(colorName: string): string {
-  const colorMap: Record<string, string> = {
-    black: "#000000",
-    white: "#FFFFFF",
-    red: "#DC2626",
-    blue: "#2563EB",
-    green: "#16A34A",
-    yellow: "#EAB308",
-    orange: "#EA580C",
-    purple: "#9333EA",
-    pink: "#EC4899",
-    gray: "#6B7280",
-    grey: "#6B7280",
-    brown: "#92400E",
-    navy: "#1E3A8A",
-    olive: "#65A30D",
-    tan: "#D4A574",
-    khaki: "#C3B091",
-    camo: "#78866B",
-    blaze: "#FF6600",
-    charcoal: "#36454F",
-    cream: "#FFFDD0",
-    beige: "#F5F5DC",
-    maroon: "#800000",
-    teal: "#008080",
-    coral: "#FF7F50",
-    mint: "#98FF98",
-    sage: "#9DC183",
-    rust: "#B7410E",
-    burgundy: "#800020",
-    forest: "#228B22",
-    hunter: "#355E3B",
-  };
-
-  const lowerName = colorName.toLowerCase();
-  return (
-    colorMap[lowerName] ||
-    colorMap[lowerName.split(" ")[0]] ||
-    colorMap[lowerName.split("/")[0]?.trim()] ||
-    "#9CA3AF"
   );
 }
