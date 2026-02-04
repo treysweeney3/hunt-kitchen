@@ -222,10 +222,10 @@ export function Header({ user }: HeaderProps) {
                 size="icon"
                 className="relative text-forestGreen hover:bg-transparent hover:text-hunterOrange"
                 onClick={() => setCartOpen(true)}
-                aria-label={`Shopping cart with ${cartItemCount} items`}
+                aria-label={`Shopping cart with ${mounted ? cartItemCount : 0} items`}
               >
                 <ShoppingCart className="h-5 w-5" />
-                {cartItemCount > 0 && (
+                {mounted && cartItemCount > 0 && (
                   <Badge
                     variant="destructive"
                     className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-hunterOrange p-0 text-xs text-white"

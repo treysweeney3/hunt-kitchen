@@ -11,7 +11,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
@@ -105,7 +104,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
           </div>
         ) : (
           <div className="flex h-[calc(100vh-88px)] flex-col">
-            <ScrollArea className="flex-1 px-6 py-4">
+            <div className="cart-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-4">
               <div className="space-y-4">
                 {items.map((item) => {
                   const isRemoving = removingItems.has(item.variant_id);
@@ -219,10 +218,10 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                   );
                 })}
               </div>
-            </ScrollArea>
+            </div>
 
-            {/* Cart Summary */}
-            <div className="border-t border-stone bg-white p-6">
+            {/* Cart Summary - Fixed to bottom */}
+            <div className="flex-shrink-0 border-t border-stone bg-white p-6">
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate">Subtotal</span>

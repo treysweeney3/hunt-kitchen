@@ -11,6 +11,7 @@ import { Product, ProductVariant } from "@/types";
 import { useCartStore } from "@/stores/cartStore";
 import { toast } from "sonner";
 import { getImageUrl } from "@/lib/constants";
+import { ShoppingCart, Check } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -19,6 +20,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
   // Determine if product is sold out
@@ -71,6 +73,8 @@ export function ProductCard({ product }: ProductCardProps) {
         },
       });
       toast.success(`${product.name} added to cart`);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
     } catch (error) {
       toast.error("Failed to add to cart");
       console.error(error);
@@ -149,21 +153,55 @@ export function ProductCard({ product }: ProductCardProps) {
         {!hasMultipleOptions && !isSoldOut ? (
           <Button
             onClick={handleQuickAdd}
-            disabled={isAdding}
-            className="w-full bg-[#2D5A3D] hover:bg-[#234a30]"
+            disabled={isAdding || showSuccess}
+            className={`w-full transition-all duration-300 ${
+              showSuccess
+                ? "bg-successGreen hover:bg-successGreen"
+                : "bg-[#2D5A3D] hover:bg-[#234a30]"
+            }`}
           >
-            {isAdding ? "Adding..." : "Quick Add"}
+            {showSuccess ? (
+              <span className="flex items-center gap-2">
+                <Check className="h-4 w-4 animate-success-check" />
+                Added!
+              </span>
+            ) : isAdding ? (
+              "Adding..."
+            ) : (
+              "Quick Add"
+            )}
           </Button>
         ) : (
-          <Button
-            asChild
-            disabled={isSoldOut}
-            className={`w-full ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
-          >
-            <Link href={`/shop/${product.slug}`}>
-              {isSoldOut ? "Sold Out" : "View Product"}
-            </Link>
-          </Button>
+          <div className="flex w-full gap-2">
+            <Button
+              asChild
+              disabled={isSoldOut}
+              className={`flex-1 ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
+            >
+              <Link href={`/shop/${product.slug}`}>
+                {isSoldOut ? "Sold Out" : "View Product"}
+              </Link>
+            </Button>
+            {!isSoldOut && (
+              <Button
+                onClick={handleQuickAdd}
+                disabled={isAdding || showSuccess}
+                size="icon"
+                className={`transition-all duration-300 ${
+                  showSuccess
+                    ? "bg-successGreen hover:bg-successGreen"
+                    : "bg-[#2D5A3D] hover:bg-[#234a30]"
+                }`}
+                title="Add to cart"
+              >
+                {showSuccess ? (
+                  <Check className="h-4 w-4 animate-success-check" />
+                ) : (
+                  <ShoppingCart className={`h-4 w-4 transition-transform ${isAdding ? "scale-75" : ""}`} />
+                )}
+              </Button>
+            )}
+          </div>
         )}
       </CardFooter>
     </Card>

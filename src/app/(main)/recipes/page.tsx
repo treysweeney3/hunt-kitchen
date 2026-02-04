@@ -6,7 +6,7 @@ import type { Recipe, PaginatedResponse, RecipeFilters } from '@/types';
 import prisma from '@/lib/prisma';
 
 export const metadata: Metadata = {
-  title: 'Top 10 Recipes',
+  title: 'Top Recipes',
   description: 'Our top 10 featured wild game recipes including venison, elk, duck, and more.',
 };
 
@@ -141,7 +141,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center text-white">
             <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl">
-              Top 10 Recipes
+              Top Recipes
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-xl text-white/80">
               Our most popular wild game recipes, handpicked for you
@@ -185,18 +185,6 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
                 </p>
               </div>
             )}
-          </div>
-
-          {/* Browse All Link */}
-          <div className="mt-12 text-center">
-            <p className="text-slate mb-4">Looking for more recipes?</p>
-            <Button
-              asChild
-              size="lg"
-              className="border-2 border-forestGreen bg-transparent text-forestGreen hover:bg-forestGreen hover:text-white"
-            >
-              <a href="/recipes/all">Browse All Recipes</a>
-            </Button>
           </div>
         </div>
       </div>

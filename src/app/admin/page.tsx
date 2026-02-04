@@ -6,6 +6,7 @@ import {
   BookOpen,
   Eye,
   FolderTree,
+  BarChart3,
   Target,
 } from "lucide-react";
 import prisma from "@/lib/prisma";
@@ -130,9 +131,9 @@ export default async function AdminDashboard() {
             </Link>
           </Button>
           <Button variant="outline" className="h-auto flex-col py-4" asChild>
-            <Link href="/admin/game-types">
-              <Target className="mb-2 h-6 w-6" />
-              <span>Manage Game Types</span>
+            <Link href="/admin/reports">
+              <BarChart3 className="mb-2 h-6 w-6" />
+              <span>Reports</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto flex-col py-4" asChild>

@@ -51,16 +51,28 @@ export const useCart = () => {
 /**
  * Hook to get only the item count (optimized for badge display)
  * This prevents unnecessary re-renders when other cart properties change
+ *
+ * Note: We compute directly from state.items instead of calling state.getItemCount()
+ * because getItemCount() uses get() internally, which prevents Zustand from
+ * properly tracking the items dependency for re-renders.
  */
 export const useCartItemCount = () => {
-  return useCartStore((state) => state.getItemCount());
+  return useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0)
+  );
 };
 
 /**
  * Hook to get only the cart total (optimized for header/footer display)
+ *
+ * Note: We compute directly from state.items instead of calling state.getTotal()
+ * because getTotal() uses get() internally, which prevents Zustand from
+ * properly tracking the items dependency for re-renders.
  */
 export const useCartTotal = () => {
-  return useCartStore((state) => state.getTotal());
+  return useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.variant.price * item.quantity, 0)
+  );
 };
 
 /**

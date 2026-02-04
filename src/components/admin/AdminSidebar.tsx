@@ -9,7 +9,6 @@ import {
   FolderTree,
   Settings,
   BarChart3,
-  Target,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,11 +32,6 @@ const navigation = [
     icon: FolderTree,
   },
   {
-    name: "Game Types",
-    href: "/admin/game-types",
-    icon: Target,
-  },
-  {
     name: "Reports",
     href: "/admin/reports",
     icon: BarChart3,
@@ -53,9 +47,9 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full w-64 flex-col bg-[#2D5A3D] text-white">
+    <div className="flex h-full w-64 flex-col bg-forestGreen text-white">
       {/* Logo */}
-      <div className="flex h-16 items-center justify-center border-b border-[#1e4a2d] px-6">
+      <div className="flex h-16 items-center justify-center border-b border-barkBrown px-6">
         <Link href="/admin">
           <span className="text-xl font-bold">THK Admin</span>
         </Link>
@@ -75,8 +69,8 @@ export function AdminSidebar() {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[#E07C24] text-white"
-                    : "text-[#F5F0E6]/90 hover:bg-[#1e4a2d] hover:text-white"
+                    ? "bg-white/20 text-white border-l-2 border-white"
+                    : "text-white/90 hover:bg-barkBrown hover:text-white"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -87,13 +81,13 @@ export function AdminSidebar() {
         </nav>
       </ScrollArea>
 
-      <Separator className="bg-[#1e4a2d]" />
+      <Separator className="bg-barkBrown" />
 
       {/* User section */}
       <div className="p-4">
         <Button
           variant="ghost"
-          className="w-full justify-start text-[#F5F0E6]/90 hover:bg-[#1e4a2d] hover:text-white"
+          className="w-full justify-start text-white/90 hover:bg-barkBrown hover:text-white"
           asChild
         >
           <Link href="/api/auth/signout">

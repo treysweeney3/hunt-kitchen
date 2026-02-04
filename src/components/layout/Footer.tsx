@@ -45,7 +45,7 @@ export function Footer() {
   return (
     <footer className="bg-forestGreen border-t border-white/20">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 lg:grid-cols-5">
+        <div className="grid gap-8 lg:grid-cols-4">
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="mb-4 flex items-center space-x-3">
@@ -130,41 +130,28 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Recipes Column */}
+          {/* Quick Links Column */}
           <div>
             <h3 className="mb-4 font-serif text-lg font-semibold text-white">
-              Recipes
+              Quick Links
             </h3>
             <ul className="space-y-2">
-              {navigation.footer.recipes.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Shop Column */}
-          <div>
-            <h3 className="mb-4 font-serif text-lg font-semibold text-white">
-              Shop
-            </h3>
-            <ul className="space-y-2">
-              {navigation.footer.shop.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link
+                  href="/recipes"
+                  className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
+                >
+                  Recipes
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/shop"
+                  className="text-sm text-white/80 transition-colors hover:text-hunterOrange"
+                >
+                  Shop
+                </Link>
+              </li>
             </ul>
           </div>
 

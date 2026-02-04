@@ -10,7 +10,7 @@ export const siteConfig = {
     facebook: "https://www.facebook.com/p/The-Hunt-Kitchen-61576020279789/",
     youtube: "https://youtube.com/@TheHuntKitchen",
     tiktok: "https://tiktok.com/@the_hunt_kitchen",
-    email: "thomas@thehuntkitchen.com",
+    email: "info@thehuntkitchen.com",
   },
   creator: {
     name: "The Hunt Kitchen",

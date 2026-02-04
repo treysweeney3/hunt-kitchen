@@ -7,14 +7,21 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useCartStore } from "@/stores/cartStore";
+import { toast } from "sonner";
+import { ShoppingCart, Check } from "lucide-react";
 import type { NormalizedShopifyProduct } from "@/types/shopify";
 
 interface ShopifyProductCardProps {
   product: NormalizedShopifyProduct;
+  hideAddToCart?: boolean;
 }
 
-export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
+export function ShopifyProductCard({ product, hideAddToCart = false }: ShopifyProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const addItem = useCartStore((state) => state.addItem);
 
   // Determine if product is sold out
   const isSoldOut = !product.availableForSale;
@@ -35,6 +42,47 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
       style: "currency",
       currency: product.currencyCode,
     }).format(price);
+  };
+
+  // Handle quick add to cart
+  const handleQuickAdd = async () => {
+    const variant = product.variants[0];
+    if (!variant) return;
+
+    setIsAdding(true);
+    try {
+      const variantTitle =
+        variant.selectedOptions.length > 0
+          ? variant.selectedOptions.map((opt) => `${opt.name}: ${opt.value}`).join(", ")
+          : variant.title;
+
+      addItem({
+        product_id: product.id,
+        variant_id: variant.id,
+        quantity: 1,
+        product: {
+          id: product.id,
+          name: product.title,
+          slug: product.handle,
+          image_url: product.featuredImage?.url || "",
+        },
+        variant: {
+          id: variant.id,
+          title: variantTitle,
+          sku: variant.sku || "",
+          price: variant.price,
+          compare_at_price: variant.compareAtPrice ?? undefined,
+        },
+      });
+      toast.success(`${product.title} added to cart`);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
+    } catch (error) {
+      toast.error("Failed to add to cart");
+      console.error(error);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -95,15 +143,36 @@ export function ShopifyProductCard({ product }: ShopifyProductCardProps) {
       </CardContent>
 
       <CardFooter className="mt-auto p-3 pt-0">
-        <Button
-          asChild
-          disabled={isSoldOut}
-          className={`w-full ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
-        >
-          <Link href={`/shop/product/${product.handle}`}>
-            {isSoldOut ? "Sold Out" : "View Product"}
-          </Link>
-        </Button>
+        <div className="flex w-full gap-2">
+          <Button
+            asChild
+            disabled={isSoldOut}
+            className={`flex-1 ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
+          >
+            <Link href={`/shop/product/${product.handle}`}>
+              {isSoldOut ? "Sold Out" : "View Product"}
+            </Link>
+          </Button>
+          {!isSoldOut && !hideAddToCart && (
+            <Button
+              onClick={handleQuickAdd}
+              disabled={isAdding || showSuccess}
+              size="icon"
+              className={`transition-all duration-300 ${
+                showSuccess
+                  ? "bg-successGreen hover:bg-successGreen"
+                  : "bg-[#2D5A3D] hover:bg-[#234a30]"
+              }`}
+              title="Add to cart"
+            >
+              {showSuccess ? (
+                <Check className="h-4 w-4 animate-success-check" />
+              ) : (
+                <ShoppingCart className={`h-4 w-4 transition-transform ${isAdding ? "scale-75" : ""}`} />
+              )}
+            </Button>
+          )}
+        </div>
       </CardFooter>
     </Card>
   );

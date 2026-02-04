@@ -459,7 +459,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
                     {featuredProducts.slice(0, 4).map((product) => (
-                      <ShopifyProductCard key={product.id} product={product} />
+                      <ShopifyProductCard key={product.id} product={product} hideAddToCart />
                     ))}
                   </div>
                 </CardContent>

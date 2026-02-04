@@ -99,7 +99,7 @@ export default async function HomePage() {
           priority
         />
         <div className="absolute inset-0 bg-forestGreen/80" />
-        <div className="relative z-10 mx-auto flex min-h-[80vh] max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto flex min-h-[80vh] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-8 text-center text-white">
             <div className="flex justify-center">
               <Image

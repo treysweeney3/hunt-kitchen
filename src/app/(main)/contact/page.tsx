@@ -348,36 +348,12 @@ export default function ContactPage() {
                 <CardContent>
                   <p className="text-slate">
                     We typically respond to all inquiries within 24-48 hours during
-                    business days. For urgent matters, please indicate so in your
-                    message.
+                    business days.
                   </p>
                 </CardContent>
               </Card>
             </div>
           </div>
-
-          {/* FAQ Section */}
-          <section className="mt-16">
-            <h2 className="mb-8 font-serif text-3xl font-bold text-forestGreen text-center">
-              Frequently Asked Questions
-            </h2>
-            <Card>
-              <CardContent className="pt-6">
-                <Accordion type="single" collapsible className="w-full">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left font-semibold text-forestGreen">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-slate">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </CardContent>
-            </Card>
-          </section>
         </div>
       </div>
     </div>
