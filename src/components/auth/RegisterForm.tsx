@@ -29,7 +29,7 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const { register: registerUser, login, loginWithGoogle } = useAuth();
+  const { register: registerUser, login } = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,18 +73,6 @@ export function RegisterForm() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred during registration");
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await loginWithGoogle("/account");
-    } catch (err) {
-      setError("Failed to sign in with Google");
       setIsLoading(false);
     }
   };
@@ -177,27 +165,6 @@ export function RegisterForm() {
             {isLoading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
-
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleLogin}
-          disabled={isLoading}
-        >
-          Sign up with Google
-        </Button>
 
         <div className="mt-4 text-center text-sm">
           <span className="text-muted-foreground">Already have an account? </span>

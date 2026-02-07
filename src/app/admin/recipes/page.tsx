@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Eye, Pencil, Trash2, MoreHorizontal } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2, MoreHorizontal, ArrowUpDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -160,12 +160,20 @@ export default function RecipesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Recipes</h2>
-        <Button asChild>
-          <Link href="/admin/recipes/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Recipe
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/admin/recipes/reorder">
+              <ArrowUpDown className="mr-2 h-4 w-4" />
+              Reorder
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/admin/recipes/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Recipe
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <DataTable

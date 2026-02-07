@@ -21,7 +21,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const { login, loginWithGoogle } = useAuth();
+  const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
@@ -48,18 +48,6 @@ export function LoginForm() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred during login");
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await loginWithGoogle(callbackUrl);
-    } catch (err) {
-      setError("Failed to sign in with Google");
       setIsLoading(false);
     }
   };
@@ -110,27 +98,6 @@ export function LoginForm() {
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
-
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleLogin}
-          disabled={isLoading}
-        >
-          Sign in with Google
-        </Button>
 
         <div className="mt-4 text-center text-sm">
           <span className="text-muted-foreground">Don't have an account? </span>

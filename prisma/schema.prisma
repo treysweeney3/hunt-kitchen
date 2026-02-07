@@ -136,6 +136,7 @@ model Recipe {
   isPublished        Boolean    @default(false) @map("is_published")
   publishedAt        DateTime?  @map("published_at")
   viewCount          Int        @default(0) @map("view_count")
+  displayOrder       Int        @default(0) @map("display_order")
   metaTitle          String?    @map("meta_title")
   metaDescription    String?    @map("meta_description")
   createdAt          DateTime   @default(now()) @map("created_at")
@@ -151,6 +152,7 @@ model Recipe {
   @@index([gameTypeId])
   @@index([isPublished, isFeatured])
   @@index([isPublished, publishedAt])
+  @@index([isPublished, displayOrder])
   @@map("recipes")
 }
 
@@ -233,4 +235,17 @@ model ContactSubmission {
   @@index([isRead])
   @@index([createdAt])
   @@map("contact_submissions")
+}
+
+// ================================
+// SITE CONTENT MODELS
+// ================================
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_content")
 }

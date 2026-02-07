@@ -4,33 +4,12 @@ import { Button } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
 import { TikTokGrid } from '@/components/content/TikTokEmbed';
 import { InstagramGrid } from '@/components/content/InstagramEmbed';
+import { getSiteContent } from '@/lib/site-content';
 
 export const metadata: Metadata = {
   title: 'Content',
   description: 'Watch The Hunt Kitchen videos on YouTube and follow us on social media for wild game cooking inspiration, tips, and behind-the-scenes content.',
 };
-
-// YouTube videos - featured video is first
-const youtubeVideos = [
-  { id: 'geDFMhYxRbQ', title: 'These Venison Enchiladas Will Make You a Believer in Venison!', featured: true },
-  { id: '00000000000', title: 'Perfect Venison Steak Every Time' },
-  { id: '00000000000', title: 'Field to Fork: Processing Your Harvest' },
-  { id: '00000000000', title: 'Wild Boar BBQ Masterclass' },
-];
-
-// TikTok videos - replace with actual video IDs
-const tiktokVideos = [
-  { id: '7546725499482000654', title: 'Venison Steak Tacos' },
-  { id: '7581628448540609847', title: 'Parmesan Crusted Venison' },
-  { id: '7567773633007930638', title: 'Venison Mac and Cheese' },
-];
-
-// Instagram posts - replace with actual post IDs (the code after /p/ in Instagram URLs)
-const instagramPosts = [
-  { id: 'DNJrlktJidZ' },
-  { id: 'DSyKuSKiagL' },
-  { id: 'DQaJSWViTCp' },
-];
 
 // TikTok icon component
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -65,7 +44,13 @@ const InstagramIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function ContentPage() {
+export default async function ContentPage() {
+  const [tiktokVideos, instagramPosts, youtubeVideos] = await Promise.all([
+    getSiteContent('tiktok_videos'),
+    getSiteContent('instagram_posts'),
+    getSiteContent('youtube_videos'),
+  ]);
+
   const featuredVideo = youtubeVideos.find(v => v.featured);
   const otherVideos = youtubeVideos.filter(v => !v.featured);
 

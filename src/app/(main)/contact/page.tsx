@@ -52,9 +52,17 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Implement actual API call
-      // Include inquiryType in submission: { ...formData, inquiryType }
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, inquiryType }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
 
       toast.success('Message sent successfully! We\'ll get back to you soon.');
       setFormData({

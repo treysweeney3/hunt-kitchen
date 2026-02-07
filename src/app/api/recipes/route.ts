@@ -65,6 +65,9 @@ export async function GET(request: NextRequest) {
         // For rating sort, we'll need to aggregate ratings
         orderBy = { createdAt: "desc" }; // Fallback for now
         break;
+      case "displayOrder":
+        orderBy = [{ displayOrder: "asc" }, { publishedAt: "desc" }];
+        break;
       case "newest":
       default:
         orderBy = { publishedAt: "desc" };

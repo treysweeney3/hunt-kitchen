@@ -39,6 +39,9 @@ async function getRecipes(sortBy: string = 'popular'): Promise<PaginatedResponse
     case 'cookTime':
       orderBy = { cookTimeMinutes: 'asc' };
       break;
+    case 'displayOrder':
+      orderBy = [{ displayOrder: 'asc' }, { publishedAt: 'desc' }];
+      break;
   }
 
   // Only show featured recipes
@@ -162,6 +165,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="popular">Most Popular</SelectItem>
+                  <SelectItem value="displayOrder">Our Picks</SelectItem>
                   <SelectItem value="newest">Newest</SelectItem>
                   <SelectItem value="rating">Highest Rated</SelectItem>
                   <SelectItem value="prepTime">Prep Time</SelectItem>

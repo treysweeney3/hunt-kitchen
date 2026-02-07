@@ -105,6 +105,7 @@ export interface Recipe {
   isPublished: boolean;
   publishedAt: Date | null;
   viewCount: number;
+  displayOrder?: number;
   metaTitle: string | null;
   metaDescription: string | null;
   createdAt: Date;
@@ -384,7 +385,7 @@ export interface RecipeFilters {
   minRating?: number;
   isFeatured?: boolean;
   search?: string;
-  sortBy?: "newest" | "popular" | "rating" | "prepTime" | "cookTime";
+  sortBy?: "newest" | "popular" | "rating" | "prepTime" | "cookTime" | "displayOrder";
   page?: number;
   limit?: number;
 }
@@ -477,6 +478,10 @@ export interface ContactFormInput {
   email: string;
   subject?: string;
   message: string;
+  inquiryType?: string;
+  companyName?: string;
+  jobTitle?: string;
+  collaborationType?: string;
 }
 
 export interface RecipeEditorInput {

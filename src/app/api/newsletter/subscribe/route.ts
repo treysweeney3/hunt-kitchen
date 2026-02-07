@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendNewsletterWelcome, addContactToResend } from "@/lib/email";
 
 // Type for request body
 interface SubscribeBody {
@@ -39,6 +40,21 @@ export async function POST(request: NextRequest) {
           },
         });
 
+        try {
+          await Promise.all([
+            sendNewsletterWelcome({
+              email: body.email.toLowerCase(),
+              firstName: body.firstName || existingSubscriber.firstName,
+            }),
+            addContactToResend({
+              email: body.email.toLowerCase(),
+              firstName: body.firstName || existingSubscriber.firstName,
+            }),
+          ]);
+        } catch (emailError) {
+          console.error("Error sending newsletter welcome:", emailError);
+        }
+
         return NextResponse.json(
           {
             message: "Successfully resubscribed to newsletter",
@@ -63,6 +79,21 @@ export async function POST(request: NextRequest) {
         isSubscribed: true,
       },
     });
+
+    try {
+      await Promise.all([
+        sendNewsletterWelcome({
+          email: subscriber.email,
+          firstName: subscriber.firstName,
+        }),
+        addContactToResend({
+          email: subscriber.email,
+          firstName: subscriber.firstName,
+        }),
+      ]);
+    } catch (emailError) {
+      console.error("Error sending newsletter welcome:", emailError);
+    }
 
     return NextResponse.json(
       {

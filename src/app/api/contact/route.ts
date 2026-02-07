@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import {
+  sendContactAdminNotification,
+  sendContactUserConfirmation,
+} from "@/lib/email";
 
 // Type for request body
 interface ContactBody {
@@ -7,6 +11,10 @@ interface ContactBody {
   email: string;
   subject?: string;
   message: string;
+  inquiryType?: string;
+  companyName?: string;
+  jobTitle?: string;
+  collaborationType?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -43,20 +51,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Build subject and message with business details encoded
+    const isBusiness = body.inquiryType === "business";
+    let subject = body.subject?.trim() || null;
+    let message = body.message.trim();
+
+    if (isBusiness) {
+      const prefix = "[BUSINESS]";
+      const companyPart = body.companyName ? ` - ${body.companyName.trim()}` : "";
+      subject = subject
+        ? `${prefix}${companyPart} ${subject}`
+        : `${prefix}${companyPart} Business Inquiry`;
+
+      const businessLines = [
+        "",
+        "---",
+        `Inquiry Type: Business Collaboration`,
+        body.companyName ? `Company: ${body.companyName.trim()}` : null,
+        body.jobTitle ? `Role/Title: ${body.jobTitle.trim()}` : null,
+        body.collaborationType
+          ? `Collaboration Type: ${body.collaborationType}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      message = message + "\n" + businessLines;
+    }
+
     // Create contact submission
     const submission = await prisma.contactSubmission.create({
       data: {
         name: body.name.trim(),
         email: body.email.toLowerCase().trim(),
-        subject: body.subject?.trim() || null,
-        message: body.message.trim(),
+        subject,
+        message,
         isRead: false,
         isReplied: false,
       },
     });
 
-    // TODO: Send email notification to admin
-    // TODO: Send confirmation email to user
+    // Send emails (failures logged but don't fail the request)
+    console.log("[CONTACT] Submission saved, sending emails...");
+    const emailData = {
+      name: body.name.trim(),
+      email: body.email.toLowerCase().trim(),
+      subject,
+      message,
+      inquiryType: body.inquiryType,
+      companyName: body.companyName?.trim(),
+      jobTitle: body.jobTitle?.trim(),
+      collaborationType: body.collaborationType,
+    };
+
+    try {
+      await Promise.all([
+        sendContactAdminNotification(emailData),
+        sendContactUserConfirmation(emailData),
+      ]);
+    } catch (emailError) {
+      console.error("Error sending contact emails:", emailError);
+    }
 
     return NextResponse.json(
       {

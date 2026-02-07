@@ -5,6 +5,7 @@ import {
   Plus,
   BookOpen,
   Eye,
+  Film,
   FolderTree,
   BarChart3,
   Target,
@@ -119,9 +120,9 @@ export default async function AdminDashboard() {
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Button variant="outline" className="h-auto flex-col py-4" asChild>
-            <Link href="/admin/recipes/new">
-              <BookOpen className="mb-2 h-6 w-6" />
-              <span>Create Recipe</span>
+            <Link href="/admin/content">
+              <Film className="mb-2 h-6 w-6" />
+              <span>Edit Content</span>
             </Link>
           </Button>
           <Button variant="outline" className="h-auto flex-col py-4" asChild>

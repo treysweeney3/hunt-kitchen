@@ -10,6 +10,7 @@ import { TikTokGrid } from '@/components/content/TikTokEmbed';
 import { siteConfig } from '@/config/site';
 import prisma from '@/lib/prisma';
 import { getProductsByHandles, isShopifyConfigured } from '@/lib/shopify';
+import { getSiteContent } from '@/lib/site-content';
 import type { Recipe } from '@/types';
 
 // TikTok icon component
@@ -23,13 +24,6 @@ const TikTokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// TikTok videos for homepage
-const tiktokVideos = [
-  { id: '7546725499482000654', title: 'Venison Steak Tacos' },
-  { id: '7581628448540609847', title: 'Parmesan Crusted Venison' },
-  { id: '7567773633007930638', title: 'Venison Mac and Cheese' },
-];
-
 async function getFeaturedRecipes(): Promise<Recipe[]> {
   const recipes = await prisma.recipe.findMany({
     where: { isPublished: true, isFeatured: true },
@@ -40,7 +34,7 @@ async function getFeaturedRecipes(): Promise<Recipe[]> {
       },
     },
     take: 4,
-    orderBy: { publishedAt: 'desc' },
+    orderBy: [{ displayOrder: 'asc' }, { publishedAt: 'desc' }],
   });
 
   return recipes.map((recipe) => {
@@ -82,9 +76,10 @@ const FEATURED_PRODUCT_HANDLES = [
 ];
 
 export default async function HomePage() {
-  const [featuredRecipes, featuredProducts] = await Promise.all([
+  const [featuredRecipes, featuredProducts, tiktokVideos] = await Promise.all([
     getFeaturedRecipes(),
     isShopifyConfigured() ? getProductsByHandles(FEATURED_PRODUCT_HANDLES) : Promise.resolve([]),
+    getSiteContent('homepage_tiktok_videos'),
   ]);
 
   return (

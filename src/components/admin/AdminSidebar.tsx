@@ -7,6 +7,9 @@ import {
   LayoutDashboard,
   BookOpen,
   FolderTree,
+  Film,
+  Mail,
+  Users,
   Settings,
   BarChart3,
   LogOut,
@@ -30,6 +33,21 @@ const navigation = [
     name: "Categories",
     href: "/admin/categories",
     icon: FolderTree,
+  },
+  {
+    name: "Content",
+    href: "/admin/content",
+    icon: Film,
+  },
+  {
+    name: "Submissions",
+    href: "/admin/submissions",
+    icon: Mail,
+  },
+  {
+    name: "Subscribers",
+    href: "/admin/subscribers",
+    icon: Users,
   },
   {
     name: "Reports",

@@ -19,9 +19,10 @@ export async function GET() {
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        { displayOrder: "asc" },
+        { createdAt: "desc" },
+      ],
     });
 
     return NextResponse.json(recipes);
@@ -45,9 +46,16 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { categoryIds, ...recipeData } = body;
 
+    // Auto-assign next displayOrder
+    const maxOrder = await prisma.recipe.aggregate({
+      _max: { displayOrder: true },
+    });
+    const nextOrder = (maxOrder._max.displayOrder ?? 0) + 1;
+
     const recipe = await prisma.recipe.create({
       data: {
         ...recipeData,
+        displayOrder: nextOrder,
         categories: {
           create: categoryIds.map((categoryId: string) => ({
             category: {
