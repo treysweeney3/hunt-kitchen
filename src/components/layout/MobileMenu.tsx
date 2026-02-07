@@ -91,7 +91,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
               <div className="mb-6">
                 <div className="space-y-2">
                   <Link
-                    href="/auth/signin"
+                    href="/login"
                     onClick={handleLinkClick}
                     className="block"
                   >
@@ -100,7 +100,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                     </Button>
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/register"
                     onClick={handleLinkClick}
                     className="block"
                   >
