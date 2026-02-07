@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +34,7 @@ export function RegisterForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true);
 
   const {
     register,
@@ -60,6 +62,7 @@ export function RegisterForm() {
         lastName: data.lastName,
         email: data.email,
         password: data.password,
+        subscribeNewsletter,
       });
 
       // Automatically log in after registration
@@ -159,6 +162,18 @@ export function RegisterForm() {
             {errors.confirmPassword && (
               <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
             )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="subscribeNewsletter"
+              checked={subscribeNewsletter}
+              onCheckedChange={(checked) => setSubscribeNewsletter(checked === true)}
+              disabled={isLoading}
+            />
+            <Label htmlFor="subscribeNewsletter" className="text-sm font-normal cursor-pointer">
+              Subscribe to our newsletter for The Hunt Kitchen updates
+            </Label>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>

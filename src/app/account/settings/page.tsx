@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
@@ -51,8 +50,6 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
 interface EmailPreferences {
-  newRecipes: boolean;
-  promotions: boolean;
   newsletter: boolean;
 }
 
@@ -65,8 +62,6 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const [emailPreferences, setEmailPreferences] = useState<EmailPreferences>({
-    newRecipes: true,
-    promotions: false,
     newsletter: false,
   });
 
@@ -397,58 +392,20 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <label className="text-sm font-medium">New Recipes</label>
-                  <p className="text-sm text-gray-500">
-                    Get notified when we publish new wild game recipes
-                  </p>
-                </div>
-                <Switch
-                  checked={emailPreferences.newRecipes}
-                  onCheckedChange={(checked) =>
-                    updateEmailPreference("newRecipes", checked)
-                  }
-                  disabled={updatingPreferences}
-                />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <label className="text-sm font-medium">Newsletter</label>
+                <p className="text-sm text-gray-500">
+                  Receive new recipes, cooking tips, and updates
+                </p>
               </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <label className="text-sm font-medium">Promotions</label>
-                  <p className="text-sm text-gray-500">
-                    Receive special offers and promotional emails
-                  </p>
-                </div>
-                <Switch
-                  checked={emailPreferences.promotions}
-                  onCheckedChange={(checked) =>
-                    updateEmailPreference("promotions", checked)
-                  }
-                  disabled={updatingPreferences}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <label className="text-sm font-medium">Newsletter</label>
-                  <p className="text-sm text-gray-500">
-                    Weekly newsletter with tips, recipes, and updates
-                  </p>
-                </div>
-                <Switch
-                  checked={emailPreferences.newsletter}
-                  onCheckedChange={(checked) =>
-                    updateEmailPreference("newsletter", checked)
-                  }
-                  disabled={updatingPreferences}
-                />
-              </div>
+              <Switch
+                checked={emailPreferences.newsletter}
+                onCheckedChange={(checked) =>
+                  updateEmailPreference("newsletter", checked)
+                }
+                disabled={updatingPreferences}
+              />
             </div>
           </CardContent>
         </Card>
@@ -486,13 +443,15 @@ export default function SettingsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your account and
-              remove all your data from our servers including:
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Saved recipes</li>
-                <li>Account preferences</li>
-              </ul>
+            <AlertDialogDescription asChild>
+              <div>
+                This action cannot be undone. This will permanently delete your account and
+                remove all your data from our servers including:
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Saved recipes</li>
+                  <li>Account preferences</li>
+                </ul>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

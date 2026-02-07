@@ -157,18 +157,26 @@ export function Header({ user }: HeaderProps) {
                     )}
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/account/settings"
+                        href="/account"
                         className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
-                        Settings
+                        My Account
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/account/favorites"
+                        href="/account/saved-recipes"
                         className="cursor-pointer text-forestGreen hover:text-hunterOrange"
                       >
-                        Favorites
+                        Saved Recipes
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/account/settings"
+                        className="cursor-pointer text-forestGreen hover:text-hunterOrange"
+                      >
+                        Settings
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

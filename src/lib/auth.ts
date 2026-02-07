@@ -131,6 +131,9 @@ export const authOptions: NextAuthOptions = {
         token.firstName = session.firstName || token.firstName;
         token.lastName = session.lastName || token.lastName;
         token.email = session.email || token.email;
+        if (session.emailVerified !== undefined) {
+          token.emailVerified = !!session.emailVerified;
+        }
       }
 
       return token;

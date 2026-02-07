@@ -12,6 +12,7 @@ interface LoginCredentials {
 interface RegisterData extends LoginCredentials {
   firstName: string;
   lastName: string;
+  subscribeNewsletter?: boolean;
 }
 
 export function useAuth() {

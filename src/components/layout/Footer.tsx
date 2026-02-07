@@ -1,13 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Instagram, Facebook, Youtube, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Instagram, Facebook, Youtube } from 'lucide-react';
 import { siteConfig, navigation } from '@/config/site';
-import { toast } from 'sonner';
+import { NewsletterForm } from '@/components/shared/NewsletterForm';
 
 // Pinterest icon from Lucide isn't available, so we'll create a simple SVG
 const TikTok = ({ className }: { className?: string }) => (
@@ -22,26 +19,6 @@ const TikTok = ({ className }: { className?: string }) => (
 );
 
 export function Footer() {
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsSubmitting(true);
-    try {
-      // TODO: Implement newsletter subscription API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success('Thanks for subscribing to our newsletter!');
-      setEmail('');
-    } catch (error) {
-      toast.error('Failed to subscribe. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <footer className="bg-forestGreen border-t border-white/20">
       <div className="container mx-auto px-4 py-12">
@@ -70,23 +47,7 @@ export function Footer() {
               <p className="mb-3 text-sm text-white/80">
                 Get weekly recipes, cooking tips, and exclusive offers.
               </p>
-              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="Your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="border-white/20 bg-white/10 text-white placeholder:text-white/50"
-                />
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-hunterOrange text-white hover:bg-hunterOrange/90"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </form>
+              <NewsletterForm />
             </div>
 
             {/* Social Media */}

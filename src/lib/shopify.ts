@@ -339,16 +339,21 @@ export async function getProducts(
 export async function getProductByHandle(
   handle: string
 ): Promise<NormalizedShopifyProduct | null> {
-  const data = await shopifyFetch<ShopifyProductResponse>(
-    GET_PRODUCT_BY_HANDLE_QUERY,
-    { handle }
-  );
+  try {
+    const data = await shopifyFetch<ShopifyProductResponse>(
+      GET_PRODUCT_BY_HANDLE_QUERY,
+      { handle }
+    );
 
-  if (!data.product) {
+    if (!data.product) {
+      return null;
+    }
+
+    return normalizeProduct(data.product);
+  } catch (error) {
+    console.error(`[Shopify] Failed to fetch product "${handle}":`, error);
     return null;
   }
-
-  return normalizeProduct(data.product);
 }
 
 /**

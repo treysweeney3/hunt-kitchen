@@ -10,27 +10,8 @@ import {
   Settings,
   ArrowRight,
 } from "lucide-react";
-import { Recipe } from "@/types";
-
-async function getSavedRecipes(userId: string): Promise<Recipe[]> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/account/saved-recipes?limit=4`,
-      {
-        cache: "no-store",
-        headers: {
-          "x-user-id": userId,
-        },
-      }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.recipes || [];
-  } catch (error) {
-    console.error("Failed to fetch saved recipes:", error);
-    return [];
-  }
-}
+import { EmailVerificationBanner } from "@/components/auth/EmailVerificationBanner";
+import prisma from "@/lib/prisma";
 
 export default async function AccountDashboard() {
   const session = await getServerSession(authOptions);
@@ -39,7 +20,31 @@ export default async function AccountDashboard() {
     redirect("/login");
   }
 
-  const savedRecipes = await getSavedRecipes(session.user.id);
+  const [savedRecipeRows, dbUser] = await Promise.all([
+    prisma.savedRecipe.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      include: {
+        recipe: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            featuredImageUrl: true,
+          },
+        },
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    }),
+  ]);
+
+  const savedRecipes = savedRecipeRows.map((sr) => sr.recipe);
+
+  const emailVerified = dbUser?.emailVerified ?? session.user.emailVerified;
 
   const quickLinks = [
     {
@@ -69,6 +74,8 @@ export default async function AccountDashboard() {
           Manage your saved recipes and account settings.
         </p>
       </div>
+
+      {!emailVerified && <EmailVerificationBanner />}
 
       {/* Quick Links Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -125,7 +132,7 @@ export default async function AccountDashboard() {
                 >
                   <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-2">
                     <Image
-                      src={recipe.featuredImageUrl}
+                      src={recipe.featuredImageUrl || "/placeholder-recipe.jpg"}
                       alt={recipe.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform"

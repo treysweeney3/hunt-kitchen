@@ -10,6 +10,7 @@ import {
   Film,
   Mail,
   Users,
+  Send,
   Settings,
   BarChart3,
   LogOut,
@@ -48,6 +49,11 @@ const navigation = [
     name: "Subscribers",
     href: "/admin/subscribers",
     icon: Users,
+  },
+  {
+    name: "Newsletter",
+    href: "/admin/newsletter",
+    icon: Send,
   },
   {
     name: "Reports",
