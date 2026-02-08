@@ -123,7 +123,7 @@ export default async function CategoryRecipesPage({ params, searchParams }: Cate
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate whitespace-nowrap">Sort by:</span>
             <Select defaultValue={sortBy}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

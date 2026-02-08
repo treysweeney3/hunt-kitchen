@@ -85,7 +85,7 @@ export function ShopFilters({ className }: ShopFiltersProps) {
       <div className="flex items-center gap-2">
         <span className="whitespace-nowrap text-sm text-slate">Sort by:</span>
         <Select value={currentSort} onValueChange={handleSortChange}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
