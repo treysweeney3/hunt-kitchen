@@ -176,7 +176,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button
               asChild
               disabled={isSoldOut}
-              className={`flex-1 ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
+              className={`flex-1 shrink min-w-0 ${isSoldOut ? "bg-gray-400 text-white hover:bg-gray-400" : "bg-[#2D5A3D] hover:bg-[#234a30]"}`}
             >
               <Link href={`/shop/${product.slug}`}>
                 {isSoldOut ? "Sold Out" : "View Product"}
