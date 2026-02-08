@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
-import { X, ChevronRight, User, ShoppingBag } from 'lucide-react';
+import { X, ChevronRight, ShoppingBag, User as UserIcon, Bookmark, Settings, LayoutDashboard, LogOut } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -22,6 +22,7 @@ interface MobileMenuProps {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    role?: string | null;
   } | null;
 }
 
@@ -53,36 +54,63 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
 
         <div className="flex h-[calc(100vh-88px)] flex-col">
           <div className="flex-1 overflow-y-auto px-6 py-4">
-            {/* User Section */}
+            {/* Account Section */}
             {user ? (
               <div className="mb-6">
-                <div className="flex items-center space-x-3 rounded-lg bg-stone/30 p-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-forestGreen text-white">
-                    <User className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="truncate font-semibold text-forestGreen">
-                      {user.name}
-                    </p>
-                    <p className="truncate text-xs text-slate">{user.email}</p>
-                  </div>
-                </div>
-                <div className="mt-3 space-y-2">
+                <div className="space-y-1">
+                  {user.role === 'ADMIN' && (
+                    <Link
+                      href="/admin"
+                      onClick={handleLinkClick}
+                      className={cn(
+                        'flex items-center space-x-3 rounded-lg px-4 py-3 font-semibold transition-colors',
+                        pathname === '/admin'
+                          ? 'bg-hunterOrange/10 text-hunterOrange'
+                          : 'text-forestGreen hover:bg-stone/30'
+                      )}
+                    >
+                      <LayoutDashboard className="h-5 w-5" />
+                      <span>Admin Dashboard</span>
+                    </Link>
+                  )}
+                  <Link
+                    href="/account"
+                    onClick={handleLinkClick}
+                    className={cn(
+                      'flex items-center space-x-3 rounded-lg px-4 py-3 font-semibold transition-colors',
+                      pathname === '/account'
+                        ? 'bg-hunterOrange/10 text-hunterOrange'
+                        : 'text-forestGreen hover:bg-stone/30'
+                    )}
+                  >
+                    <UserIcon className="h-5 w-5" />
+                    <span>My Account</span>
+                  </Link>
+                  <Link
+                    href="/account/saved-recipes"
+                    onClick={handleLinkClick}
+                    className={cn(
+                      'flex items-center space-x-3 rounded-lg px-4 py-3 font-semibold transition-colors',
+                      pathname === '/account/saved-recipes'
+                        ? 'bg-hunterOrange/10 text-hunterOrange'
+                        : 'text-forestGreen hover:bg-stone/30'
+                    )}
+                  >
+                    <Bookmark className="h-5 w-5" />
+                    <span>Saved Recipes</span>
+                  </Link>
                   <Link
                     href="/account/settings"
                     onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:text-hunterOrange hover:font-bold"
+                    className={cn(
+                      'flex items-center space-x-3 rounded-lg px-4 py-3 font-semibold transition-colors',
+                      pathname === '/account/settings'
+                        ? 'bg-hunterOrange/10 text-hunterOrange'
+                        : 'text-forestGreen hover:bg-stone/30'
+                    )}
                   >
+                    <Settings className="h-5 w-5" />
                     <span>Settings</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    href="/account/favorites"
-                    onClick={handleLinkClick}
-                    className="flex items-center justify-between rounded-lg px-4 py-2 text-sm text-forestGreen hover:text-hunterOrange hover:font-bold"
-                  >
-                    <span>Favorites</span>
-                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>
                 <Separator className="my-4 bg-stone" />
@@ -162,6 +190,7 @@ export function MobileMenu({ open, onClose, user }: MobileMenuProps) {
                     signOut({ callbackUrl: '/' });
                   }}
                 >
+                  <LogOut className="mr-2 h-5 w-5" />
                   Sign Out
                 </Button>
               )}
