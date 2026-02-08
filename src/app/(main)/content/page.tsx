@@ -61,7 +61,7 @@ export default async function ContentPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center text-white">
             <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl">
-              Hunt Kitchen Content
+              The Hunt Kitchen Content
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-xl text-white/80">
               Videos, tips, and inspiration for wild game cooking enthusiasts

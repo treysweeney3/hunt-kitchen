@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Header } from "@/components/layout/Header";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminShell } from "@/components/admin/AdminShell";
 
 export default async function AdminLayout({
   children,
@@ -25,12 +25,7 @@ export default async function AdminLayout({
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <Header user={user} />
-      <div className="flex flex-1 min-h-0">
-        <AdminSidebar />
-        <main className="flex-1 overflow-y-auto bg-cream p-6">
-          {children}
-        </main>
-      </div>
+      <AdminShell>{children}</AdminShell>
     </div>
   );
 }
