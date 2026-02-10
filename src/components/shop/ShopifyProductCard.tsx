@@ -140,6 +140,11 @@ export function ShopifyProductCard({ product, hideAddToCart = false }: ShopifyPr
           </span>
         </div>
 
+        {product.handle === "pre-order-cookbook" && (
+          <p className="mt-1 text-xs text-gray-400">
+            This item is available for pre-order. Estimated to ship in 2-3 weeks.
+          </p>
+        )}
       </CardContent>
 
       <CardFooter className="mt-auto p-3 pt-0">

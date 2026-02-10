@@ -9,7 +9,7 @@ import { GameTypeCarousel } from '@/components/shared/GameTypeCarousel';
 import { TikTokGrid } from '@/components/content/TikTokEmbed';
 import { siteConfig } from '@/config/site';
 import prisma from '@/lib/prisma';
-import { getProductsByHandles, isShopifyConfigured } from '@/lib/shopify';
+import { getProducts, isShopifyConfigured } from '@/lib/shopify';
 import { getSiteContent } from '@/lib/site-content';
 import type { Recipe } from '@/types';
 
@@ -67,20 +67,14 @@ async function getFeaturedRecipes(): Promise<Recipe[]> {
   }) as Recipe[];
 }
 
-// Featured product handles for the landing page
-const FEATURED_PRODUCT_HANDLES = [
-  "cookbook-venison-edition",
-  "tshirt", // The Hunt Kitchen Mossy Oak Hat
-  "full-logo-t-shirt",
-  "logo-hoodie",
-];
-
 export default async function HomePage() {
-  const [featuredRecipes, featuredProducts, tiktokVideos] = await Promise.all([
+  const [featuredRecipes, featuredProductsResult, tiktokVideos] = await Promise.all([
     getFeaturedRecipes(),
-    isShopifyConfigured() ? getProductsByHandles(FEATURED_PRODUCT_HANDLES) : Promise.resolve([]),
+    isShopifyConfigured() ? getProducts({ query: 'tag:featured', first: 4 }) : Promise.resolve({ products: [], pageInfo: {} }),
     getSiteContent('homepage_tiktok_videos'),
   ]);
+  const featuredProducts = featuredProductsResult.products;
+  console.log('[HomePage] Featured products:', JSON.stringify(featuredProducts, null, 2));
 
   return (
     <div className="flex flex-col">
