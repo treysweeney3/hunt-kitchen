@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -89,7 +89,7 @@ export function RegisterForm() {
       <CardContent>
         {error && (
           <Alert variant="destructive" className="mb-4">
-            {error}
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 

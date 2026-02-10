@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import crypto from "crypto";
 
 let resend: Resend | null = null;
 
@@ -244,6 +245,41 @@ export async function sendVerificationEmail(data: VerificationEmailData) {
 }
 
 // ============================================================================
+// Newsletter Unsubscribe Helpers
+// ============================================================================
+
+const SITE_URL = "https://thehuntkitchen.com";
+
+function getHmacSecret(): string {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) throw new Error("NEXTAUTH_SECRET is not set");
+  return secret;
+}
+
+export function generateUnsubscribeUrl(email: string): string {
+  const sig = crypto
+    .createHmac("sha256", getHmacSecret())
+    .update(email.toLowerCase())
+    .digest("hex");
+  const encodedEmail = encodeURIComponent(email.toLowerCase());
+  return `${SITE_URL}/api/newsletter/unsubscribe?email=${encodedEmail}&sig=${sig}`;
+}
+
+export function verifyUnsubscribeSignature(
+  email: string,
+  sig: string
+): boolean {
+  const expected = crypto
+    .createHmac("sha256", getHmacSecret())
+    .update(email.toLowerCase())
+    .digest("hex");
+  return crypto.timingSafeEqual(
+    Buffer.from(expected, "hex"),
+    Buffer.from(sig, "hex")
+  );
+}
+
+// ============================================================================
 // Newsletter Compose & Send
 // ============================================================================
 
@@ -271,8 +307,12 @@ export interface NewsletterData {
   contentHtml?: string;
 }
 
-export function buildNewsletterHtml(data: NewsletterData): string {
+export function buildNewsletterHtml(
+  data: NewsletterData,
+  unsubscribeUrl?: string
+): string {
   const siteUrl = "https://thehuntkitchen.com";
+  const unsubLink = unsubscribeUrl || `${siteUrl}/contact`;
 
   // Hero section
   const heroSection =
@@ -374,7 +414,7 @@ export function buildNewsletterHtml(data: NewsletterData): string {
             You're receiving this because you subscribed to The Hunt Kitchen newsletter.
           </p>
           <p style="color: #a0a0a0; font-size: 12px; margin: 0; line-height: 1.5;">
-            <a href="mailto:info@thehuntkitchen.com?subject=Unsubscribe" style="color: #a0a0a0; text-decoration: underline;">Unsubscribe</a>
+            <a href="${unsubLink}" style="color: #a0a0a0; text-decoration: underline;">Unsubscribe</a>
             &nbsp;&middot;&nbsp;
             &copy; ${new Date().getFullYear()} The Hunt Kitchen
           </p>
@@ -398,7 +438,8 @@ export async function sendNewsletterPreview(
     return;
   }
 
-  const html = buildNewsletterHtml(data);
+  const unsubUrl = generateUnsubscribeUrl(toEmail);
+  const html = buildNewsletterHtml(data, unsubUrl);
 
   await getResend().emails.send({
     from: getFromAddress(),
@@ -421,7 +462,6 @@ export async function sendNewsletter(
     return { sent: subscribers.length, errors: 0 };
   }
 
-  const html = buildNewsletterHtml(data);
   const from = getFromAddress();
   let totalSent = 0;
   let totalErrors = 0;
@@ -429,12 +469,19 @@ export async function sendNewsletter(
   // Batch in chunks of 100 (Resend limit)
   for (let i = 0; i < subscribers.length; i += 100) {
     const chunk = subscribers.slice(i, i + 100);
-    const emails = chunk.map((sub) => ({
-      from,
-      to: sub.email,
-      subject: data.subject,
-      html,
-    }));
+    const emails = chunk.map((sub) => {
+      const unsubUrl = generateUnsubscribeUrl(sub.email);
+      return {
+        from,
+        to: sub.email,
+        subject: data.subject,
+        html: buildNewsletterHtml(data, unsubUrl),
+        headers: {
+          "List-Unsubscribe": `<${unsubUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      };
+    });
 
     try {
       await getResend().batch.send(emails);

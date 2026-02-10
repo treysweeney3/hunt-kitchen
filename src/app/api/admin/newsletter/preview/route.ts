@@ -44,7 +44,10 @@ export async function POST(request: Request) {
       contentHtml: contentHtml?.trim() || undefined,
     };
 
-    const html = buildNewsletterHtml(newsletterData);
+    const html = buildNewsletterHtml(
+      newsletterData,
+      "https://thehuntkitchen.com/unsubscribe"
+    );
 
     return new NextResponse(html, {
       headers: { "Content-Type": "text/html" },

@@ -73,6 +73,7 @@ export function useSavedRecipes() {
   return {
     savedRecipeIds,
     isLoading,
+    isAuthenticated,
     toggleSaveRecipe,
     isRecipeSaved,
     refetch: fetchSavedRecipeIds,

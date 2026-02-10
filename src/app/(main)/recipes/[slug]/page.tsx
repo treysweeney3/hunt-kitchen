@@ -16,7 +16,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown, Lightbulb, Play } from 'lucide-react';
 import { generateMetadata as generateSEOMetadata, generateRecipeStructuredData } from '@/lib/seo';
 import { siteConfig } from '@/config/site';
-import { getProductsByHandles, isShopifyConfigured } from '@/lib/shopify';
+import { getProducts, isShopifyConfigured } from '@/lib/shopify';
 import type { Recipe, RecipeRating as RecipeRatingType } from '@/types';
 
 interface RecipePageProps {
@@ -208,13 +208,6 @@ async function getRelatedRecipes(recipeId: string, gameTypeId?: string): Promise
   }) as Recipe[];
 }
 
-// Featured product handles - same as landing page
-const FEATURED_PRODUCT_HANDLES = [
-  "cookbook-venison-edition",
-  "tshirt",
-  "full-logo-t-shirt",
-  "logo-hoodie",
-];
 
 export async function generateMetadata({ params }: RecipePageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -257,7 +250,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
   const [relatedRecipes, featuredProducts, userRating] = await Promise.all([
     getRelatedRecipes(recipe.id, recipe.gameType?.id),
-    isShopifyConfigured() ? getProductsByHandles(FEATURED_PRODUCT_HANDLES) : Promise.resolve([]),
+    isShopifyConfigured() ? getProducts({ query: 'tag:featured', first: 4 }).then(r => r.products) : Promise.resolve([]),
     getUserRating(recipe.id, session?.user?.id),
   ]);
 
