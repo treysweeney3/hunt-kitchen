@@ -71,6 +71,11 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
           <h1 className="font-serif text-3xl font-bold text-[#4A3728] sm:text-4xl">
             {product.title}
           </h1>
+          {product.handle === "pre-order-cookbook" && (
+            <p className="mt-1 text-xs text-gray-600">
+              This item is available for pre-order. Estimated to ship in 3-4 weeks.
+            </p>
+          )}
         </div>
 
         {/* Variant Selector, Price & Add to Cart */}
@@ -81,8 +86,8 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
           onVariantChange={handleVariantChange}
         />
 
-        {/* Stock Status */}
-        {!isSoldOut && primaryVariant && (
+        {/* Stock Status - hidden for print-on-demand (printify) products */}
+        {!isSoldOut && primaryVariant && !product.tags.some(t => t.toLowerCase() === "printify") && (
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className="h-4 w-4 text-[#22C55E]" />
             <span className="text-slate">

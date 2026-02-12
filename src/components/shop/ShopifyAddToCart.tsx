@@ -152,7 +152,8 @@ export function ShopifyAddToCart({
           </Button>
         </div>
         {selectedVariant?.quantityAvailable !== null &&
-          selectedVariant?.quantityAvailable !== undefined && (
+          selectedVariant?.quantityAvailable !== undefined &&
+          !product.tags.some(t => t.toLowerCase() === "printify") && (
             <span className="text-sm text-gray-500">
               {selectedVariant.quantityAvailable} available
             </span>
